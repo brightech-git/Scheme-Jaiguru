@@ -32,6 +32,10 @@
         "projectId": "85e88055-33db-46da-8dc0-5ea198798ca5"
       }
     },
-    "owner": "brightechsoftware"
+    "owner": "brightechsoftware",
+    "plugins": [
+      "expo-font",
+      "expo-asset"
+    ]
   }
 }
