@@ -11,13 +11,15 @@ import {
   ToastAndroid,
   Dimensions,
   Animated,
-  Easing
+  Easing,
+  Alert
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import styles from './MpinStyles';
 
 // Toast function for iOS
 const showToast = (message) => {
+  console.log(`Toast shown: ${message}`);
   if (Platform.OS === 'android') {
     ToastAndroid.show(message, ToastAndroid.SHORT);
   } else {
@@ -26,6 +28,7 @@ const showToast = (message) => {
 };
 
 function MpinScreen({ route, navigation }) {
+  console.log('MpinScreen component rendered');
   const [mpin, setMpin] = useState(['', '', '', '']);
   const [isLoading, setIsLoading] = useState(false);
   const inputRefs = useRef([]);
@@ -33,11 +36,13 @@ function MpinScreen({ route, navigation }) {
   const slideAnim = useRef(new Animated.Value(50)).current;
 
   useEffect(() => {
+    console.log('MpinScreen useEffect triggered - checking if MPIN already created');
     checkIfMpinCreated();
     animateIn();
   }, []);
 
   const animateIn = () => {
+    console.log('Starting animation in MpinScreen');
     Animated.parallel([
       Animated.timing(fadeAnim, {
         toValue: 1,
@@ -50,14 +55,21 @@ function MpinScreen({ route, navigation }) {
         easing: Easing.out(Easing.poly(4)),
         useNativeDriver: true,
       })
-    ]).start();
+    ]).start(() => {
+      console.log('Animation completed in MpinScreen');
+    });
   };
 
   const checkIfMpinCreated = async () => {
+    console.log('Checking if MPIN is already created');
     try {
       const isMpinCreated = await AsyncStorage.getItem('isMpinCreated');
+      console.log(`isMpinCreated value from storage: ${isMpinCreated}`);
       if (isMpinCreated === 'true') {
+        console.log('MPIN already exists, navigating to VerifyMpin screen');
         navigation.replace('VerifyMpin');
+      } else {
+        console.log('No MPIN found, staying on Create MPIN screen');
       }
     } catch (error) {
       console.error('Error checking MPIN creation:', error);
@@ -65,67 +77,92 @@ function MpinScreen({ route, navigation }) {
   };
 
   const handleMpinChange = (value, index) => {
-    if (value && !/^\d$/.test(value)) return;
+    console.log(`MPIN input changed at index ${index}, value: ${value}`);
+    if (value && !/^\d$/.test(value)) {
+      console.log('Invalid input: not a digit, ignoring');
+      return;
+    }
     
     const newMpin = [...mpin];
     newMpin[index] = value;
     setMpin(newMpin);
+    console.log(`Updated MPIN array: [${newMpin}]`);
 
     if (value && index < 3) {
+      console.log(`Moving focus to next input at index ${index + 1}`);
       inputRefs.current[index + 1]?.focus();
     } else if (!value && index > 0) {
+      console.log(`Moving focus to previous input at index ${index - 1}`);
       inputRefs.current[index - 1]?.focus();
     }
   };
 
   const handleKeyPress = (event, index) => {
+    console.log(`Key pressed: ${event.nativeEvent.key} at index ${index}`);
     if (event.nativeEvent.key === 'Backspace' && !mpin[index] && index > 0) {
+      console.log('Backspace pressed on empty field, moving to previous input');
       inputRefs.current[index - 1]?.focus();
     }
   };
 
   const handleCreateMpin = async () => {
+    console.log('Create MPIN button pressed');
     const enteredMpin = mpin.join('');
+    console.log(`Entered MPIN: ${enteredMpin}`);
 
     if (enteredMpin.length !== 4) {
+      console.log('Invalid MPIN length, showing error');
       showToast('Please enter a valid 4-digit MPIN.');
       return;
     }
 
+    console.log('MPIN is valid, proceeding to save');
     setIsLoading(true);
     try {
+      console.log('Saving MPIN to AsyncStorage');
       await AsyncStorage.setItem('mpin', enteredMpin);
       await AsyncStorage.setItem('isMpinCreated', 'true');
+      console.log('MPIN saved successfully');
       showToast('MPIN created successfully!');
       setTimeout(() => {
+        console.log('Navigating to Drawer screen');
         navigation.replace('Drawer');
       }, 1000);
     } catch (error) {
+      console.error('Failed to save MPIN:', error);
       showToast('Failed to save MPIN. Please try again.');
-      console.error(error);
     } finally {
+      console.log('Create MPIN process completed');
       setIsLoading(false);
     }
   };
 
   const handleForgotMpin = async () => {
+    console.log('Forgot MPIN button pressed');
     Alert.alert(
       'Reset MPIN',
       'Are you sure you want to reset your MPIN? You will need to verify OTP again.',
       [
-        { text: 'Cancel', style: 'cancel' },
+        { 
+          text: 'Cancel', 
+          style: 'cancel',
+          onPress: () => console.log('MPIN reset cancelled')
+        },
         {
           text: 'Reset',
           style: 'destructive',
           onPress: async () => {
+            console.log('User confirmed MPIN reset');
             try {
+              console.log('Removing MPIN data from AsyncStorage');
               await AsyncStorage.removeItem('mpin');
               await AsyncStorage.removeItem('isMpinCreated');
               await AsyncStorage.removeItem('isOtpVerified');
+              console.log('MPIN data removed, navigating to OTP screen');
               navigation.replace('OTP');
             } catch (error) {
+              console.error('Failed to reset MPIN:', error);
               showToast('Failed to reset MPIN. Please try again.');
-              console.error(error);
             }
           }
         }
@@ -167,7 +204,10 @@ function MpinScreen({ route, navigation }) {
                 {mpin.map((digit, index) => (
                   <View key={index} style={styles.mpinInputWrapper}>
                     <TextInput
-                      ref={(ref) => (inputRefs.current[index] = ref)}
+                      ref={(ref) => {
+                        inputRefs.current[index] = ref;
+                        console.log(`Input ref ${index} set`);
+                      }}
                       style={[styles.mpinInput, digit ? styles.mpinInputFilled : {}]}
                       maxLength={1}
                       keyboardType="numeric"
@@ -212,6 +252,7 @@ function MpinScreen({ route, navigation }) {
 }
 
 function VerifyMpinScreen({ navigation }) {
+  console.log('VerifyMpinScreen component rendered');
   const [mpin, setMpin] = useState(['', '', '', '']);
   const [isLoading, setIsLoading] = useState(false);
   const [attempts, setAttempts] = useState(0);
@@ -220,10 +261,12 @@ function VerifyMpinScreen({ navigation }) {
   const slideAnim = useRef(new Animated.Value(50)).current;
 
   useEffect(() => {
+    console.log('VerifyMpinScreen useEffect triggered');
     animateIn();
   }, []);
 
   const animateIn = () => {
+    console.log('Starting animation in VerifyMpinScreen');
     Animated.parallel([
       Animated.timing(fadeAnim, {
         toValue: 1,
@@ -236,67 +279,103 @@ function VerifyMpinScreen({ navigation }) {
         easing: Easing.out(Easing.poly(4)),
         useNativeDriver: true,
       })
-    ]).start();
+    ]).start(() => {
+      console.log('Animation completed in VerifyMpinScreen');
+    });
   };
 
   const handleMpinChange = (value, index) => {
-    if (value && !/^\d$/.test(value)) return;
+    console.log(`MPIN input changed at index ${index}, value: ${value}`);
+    if (value && !/^\d$/.test(value)) {
+      console.log('Invalid input: not a digit, ignoring');
+      return;
+    }
     
     const newMpin = [...mpin];
     newMpin[index] = value;
     setMpin(newMpin);
+    console.log(`Updated MPIN array: [${newMpin}]`);
 
     if (value && index < 3) {
+      console.log(`Moving focus to next input at index ${index + 1}`);
       inputRefs.current[index + 1]?.focus();
     } else if (!value && index > 0) {
+      console.log(`Moving focus to previous input at index ${index - 1}`);
       inputRefs.current[index - 1]?.focus();
     }
   };
 
   const handleKeyPress = (event, index) => {
+    console.log(`Key pressed: ${event.nativeEvent.key} at index ${index}`);
     if (event.nativeEvent.key === 'Backspace' && !mpin[index] && index > 0) {
+      console.log('Backspace pressed on empty field, moving to previous input');
       inputRefs.current[index - 1]?.focus();
     }
   };
 
   const handleVerifyMpin = async () => {
+    console.log('Verify MPIN button pressed');
     const enteredMpin = mpin.join('');
+    console.log(`Entered MPIN: ${enteredMpin}`);
 
     if (enteredMpin.length !== 4) {
+      console.log('Invalid MPIN length, showing error');
       showToast('Please enter a valid 4-digit MPIN.');
       return;
     }
 
+    console.log('MPIN is valid, proceeding to verify');
     setIsLoading(true);
     try {
+      console.log('Retrieving saved MPIN from AsyncStorage');
       const savedMpin = await AsyncStorage.getItem('mpin');
+      console.log(`Saved MPIN from storage: ${savedMpin}`);
+      
       if (enteredMpin === savedMpin) {
+        console.log('MPIN verification successful');
         showToast('MPIN verified successfully!');
         setTimeout(() => {
+          console.log('Navigating to Drawer screen');
           navigation.replace('Drawer');
         }, 1000);
       } else {
-        setAttempts(prev => prev + 1);
+        console.log('MPIN verification failed');
+        const newAttempts = attempts + 1;
+        setAttempts(newAttempts);
         setMpin(['', '', '', '']);
+        console.log(`Attempt ${newAttempts} failed, resetting MPIN fields`);
         inputRefs.current[0]?.focus();
         
-        if (attempts >= 2) {
+        if (newAttempts >= 2) {
+          console.log('Maximum attempts reached, showing alert');
           Alert.alert(
             'Too Many Attempts',
             'You have exceeded the maximum number of attempts. Please reset your MPIN.',
             [
-              { text: 'Cancel', style: 'cancel' },
-              { text: 'Reset MPIN', onPress: () => navigation.navigate('OTP') }
+              { 
+                text: 'Cancel', 
+                style: 'cancel',
+                onPress: () => console.log('User cancelled MPIN reset')
+              },
+              { 
+                text: 'Reset MPIN', 
+                onPress: () => {
+                  console.log('User chose to reset MPIN, navigating to OTP screen');
+                  navigation.navigate('OTP');
+                }
+              }
             ]
           );
         } else {
-          showToast(`Incorrect MPIN. ${2 - attempts} attempts remaining.`);
+          console.log(`Showing attempt warning. ${2 - newAttempts} attempts remaining`);
+          showToast(`Incorrect MPIN. ${2 - newAttempts} attempts remaining.`);
         }
       }
     } catch (error) {
+      console.error('Failed to verify MPIN:', error);
       showToast('Failed to verify MPIN. Please try again.');
-      console.error(error);
     } finally {
+      console.log('Verify MPIN process completed');
       setIsLoading(false);
     }
   };
@@ -335,7 +414,10 @@ function VerifyMpinScreen({ navigation }) {
                 {mpin.map((digit, index) => (
                   <View key={index} style={styles.mpinInputWrapper}>
                     <TextInput
-                      ref={(ref) => (inputRefs.current[index] = ref)}
+                      ref={(ref) => {
+                        inputRefs.current[index] = ref;
+                        console.log(`Input ref ${index} set`);
+                      }}
                       style={[styles.mpinInput, digit ? styles.mpinInputFilled : {}]}
                       maxLength={1}
                       keyboardType="numeric"
@@ -355,7 +437,10 @@ function VerifyMpinScreen({ navigation }) {
               )}
             </View>
             <View style={styles.actionSection}>
-              <TouchableOpacity onPress={() => navigation.navigate('OTP')} style={styles.forgotButton}>
+              <TouchableOpacity onPress={() => {
+                console.log('Forgot MPIN pressed, navigating to OTP screen');
+                navigation.navigate('OTP');
+              }} style={styles.forgotButton}>
                 <Text style={styles.forgotText}>Forgot MPIN?</Text>
               </TouchableOpacity>
               <TouchableOpacity

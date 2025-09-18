@@ -4,9 +4,10 @@ import { View, Text, TouchableOpacity } from 'react-native'
 import styles from './styles'
 import { MaterialIcons } from '@expo/vector-icons'
 import { colors } from '../../utils'
-
+import { SafeAreaView } from 'react-native-safe-area-context'
 function BackHeader(props) {
   return (
+    <SafeAreaView style={{ backgroundColor: colors.white }}>
     <View style={styles.container}>
       <View style={styles.subContainer}>
         {/* Back Arrow Inside Circle */}
@@ -23,6 +24,7 @@ function BackHeader(props) {
         </Text>
       </View>
     </View>
+    </SafeAreaView>
   )
 }
 
