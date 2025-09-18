@@ -18,15 +18,15 @@ import GoldPlan from "../../ui/ProductCard/GoldPlans";
 import ProductCard from "../../ui/ProductCard/ProductCard";
 import { SafeAreaView } from "react-native-safe-area-context";
 import styles from "./styles";
-import { verticalScale, scale, colors } from "../../utils";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import ProductCardSkeleton from "../../components/SkeletonLoader/ProductCardSkeleton";
 import GoldPlansSkeleton from "../../components/SkeletonLoader/GoldPlansSkeleton";
 import Icon from "react-native-vector-icons/MaterialIcons";
-import FontAwesome from "react-native-vector-icons/FontAwesome";
-import { colors1 } from "../../utils/colors";
-import MainPageWithYouTube from "../Youtube/Youtube";
 import DrawerMenu from "../ProfileDashboard/ProfileContainer/ProfileSidebar";
+import appTheme from "../../utils/Theme";
+import MainPageWithYouTube from "../Youtube/Youtube";
+
+const { COLORS } = appTheme;
 
 // Toast function for iOS
 const showToast = (message) => {
@@ -43,14 +43,13 @@ function MainLanding() {
   const [silverRate, setSilverRate] = useState(null);
   const [schemes, setSchemes] = useState([]);
   const [rateUpdated, setRateUpdated] = useState(null);
-
   const [phoneSearchData, setPhoneSearchData] = useState([]);
   const [productData, setProductData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [status, setStatus] = useState(true);
-
   const [error, setError] = useState(null);
   const [animationsRunning, setAnimationsRunning] = useState(false);
+  const [minimumLoaderTimeout, setMinimumLoaderTimeout] = useState(false); // New state for minimum loader time
 
   // Animation values
   const goldAnimation = useRef(new Animated.Value(0)).current;
@@ -91,9 +90,15 @@ function MainLanding() {
 
   useEffect(() => {
     const fetchPhoneSearchData = async () => {
-      const storedPhoneNumber = await AsyncStorage.getItem("userPhoneNumber");
-      console.log(storedPhoneNumber);
+      const startTime = Date.now();
+      const MINIMUM_LOADER_TIME = 500; // Minimum time to show loader (in ms)
+
       try {
+        const storedPhoneNumber = await AsyncStorage.getItem("userPhoneNumber");
+        if (!storedPhoneNumber) {
+          throw new Error("No phone number found in AsyncStorage");
+        }
+
         const phoneResponse = await fetch(
           `https://akj.brightechsoftware.com/v1/api/account/phonesearch?phoneNo=${storedPhoneNumber}`,
           {
@@ -112,50 +117,50 @@ function MainLanding() {
         }
 
         const phoneJson = await phoneResponse.json();
+        setPhoneSearchData(phoneJson);
 
         if (phoneJson && phoneJson.length > 0) {
-          setPhoneSearchData(phoneJson);
-
+          // Parallelize account and amountWeight API calls for each item
           const productPromises = phoneJson.map(async (item) => {
             try {
-              const accountResponse = await fetch(
-                `https://akj.brightechsoftware.com/v1/api/account?regno=${item.regno}&groupcode=${item.groupcode}`,
-                {
-                  method: "GET",
-                  headers: {
-                    Accept: "application/json",
-                    "Content-Type": "application/json",
-                  },
-                }
-              );
+              const [accountResponse, amountWeightResponse] = await Promise.all([
+                fetch(
+                  `https://akj.brightechsoftware.com/v1/api/account?regno=${item.regno}&groupcode=${item.groupcode}`,
+                  {
+                    method: "GET",
+                    headers: {
+                      Accept: "application/json",
+                      "Content-Type": "application/json",
+                    },
+                  }
+                ),
+                fetch(
+                  `https://akj.brightechsoftware.com/v1/api/getAmountWeight?REGNO=${item.regno}&GROUPCODE=${item.groupcode}`,
+                  {
+                    method: "GET",
+                    headers: {
+                      Accept: "application/json",
+                      "Content-Type": "application/json",
+                    },
+                  }
+                ),
+              ]);
 
               if (!accountResponse.ok) {
                 throw new Error(
                   `Account details HTTP error! status: ${accountResponse.status}`
                 );
               }
-
-              const accountData = await accountResponse.json();
-              console.log(accountData, "accountData");
-
-              const amountWeightResponse = await fetch(
-                `https://akj.brightechsoftware.com/v1/api/getAmountWeight?REGNO=${item.regno}&GROUPCODE=${item.groupcode}`,
-                {
-                  method: "GET",
-                  headers: {
-                    Accept: "application/json",
-                    "Content-Type": "application/json",
-                  },
-                }
-              );
-
               if (!amountWeightResponse.ok) {
                 throw new Error(
                   `Amount Weight HTTP error! status: ${amountWeightResponse.status}`
                 );
               }
 
-              const amountWeightJson = await amountWeightResponse.json();
+              const [accountData, amountWeightJson] = await Promise.all([
+                accountResponse.json(),
+                amountWeightResponse.json(),
+              ]);
 
               const currentDate = new Date();
               const maturityDate = new Date(item.maturitydate);
@@ -168,15 +173,14 @@ function MainLanding() {
                 ? amountWeightJson[0] || { Weight: 0, Amount: 0 }
                 : { Weight: 0, Amount: 0 };
 
-              setStatus(itemStatus);
               return {
                 ...item,
-                amountWeight: amountWeight,
+                amountWeight,
                 status: itemStatus,
                 accountDetails: accountData,
               };
             } catch (amountError) {
-              console.error("Error fetching data:", amountError);
+              console.error("Error fetching data for item:", amountError);
               return {
                 ...item,
                 amountWeight: null,
@@ -192,7 +196,7 @@ function MainLanding() {
           );
 
           setProductData(validProductData);
-          console.log(validProductData);
+
           if (validProductData.length === 0) {
             setError("No valid product data found");
           }
@@ -201,10 +205,22 @@ function MainLanding() {
         }
       } catch (err) {
         console.error("Detailed fetch error:", err);
-        setError(`Failed fetch data: ${err.message}`);
+        setError(`Failed to fetch data: ${err.message}`);
         showToast(`Failed to load data: ${err.message}`);
       } finally {
-        setLoading(false);
+        // Ensure minimum loader time
+        const elapsedTime = Date.now() - startTime;
+        const remainingTime = MINIMUM_LOADER_TIME - elapsedTime;
+
+        if (remainingTime > 0) {
+          setTimeout(() => {
+            setLoading(false);
+            setMinimumLoaderTimeout(true);
+          }, remainingTime);
+        } else {
+          setLoading(false);
+          setMinimumLoaderTimeout(true);
+        }
       }
     };
 
@@ -340,29 +356,19 @@ function MainLanding() {
   function renderHeader() {
     return (
       <>
-        {/* Enhanced Header matching the image design */}
         <View style={styles.headerContainer1}>
-          {/* Top section with FAQ and Menu icons */}
           <View style={styles.topHeaderSection}>
             <TouchableOpacity
               style={styles.faqIconContainer}
-              onPress={() => {
-                navigation.navigate("HelpCenter");
-              }}
+              onPress={() => navigation.navigate("HelpCenter")}
             >
-              <Icon name="help" size={22} color={colors1.primaryText} />
+              <Icon name="help" size={22} color={COLORS.title} />
             </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.menuIconContainer}
-              onPress={toggleDrawer} // This opens/closes the drawer
-            >
-              <Icon name="menu" size={26} color={colors1.primaryText} />
+            <TouchableOpacity style={styles.menuIconContainer} onPress={toggleDrawer}>
+              <Icon name="menu" size={26} color={COLORS.title} />
             </TouchableOpacity>
           </View>
           <DrawerMenu isVisible={isDrawerVisible} onClose={closeDrawer} />
-
-          {/* Main header with logo and company name */}
           <View style={styles.mainHeaderSection}>
             <View style={styles.logoContainer}>
               <Image
@@ -373,28 +379,19 @@ function MainLanding() {
             </View>
             <View style={styles.companyNameContainer}>
               <Text style={styles.companyName}>Jaiguru Jewellers</Text>
-              {/* <Text style={styles.companySubtitle}>Pvt Ltd</Text> */}
             </View>
           </View>
-
-          {/* Rate update timestamp */}
           {rateUpdated && (
             <View style={styles.rateTimestampContainer}>
               <Text style={styles.rateTimestamp}>{rateUpdated}</Text>
             </View>
           )}
-
-          {/* Gold and Silver Rate Cards */}
           <View style={styles.rateCardsContainer}>
-            {/* Gold Rate Card */}
             <View style={styles.rateCard}>
               <View style={styles.rateCardContent}>
                 <View style={styles.rateIconContainer}>
                   <Animated.View
-                    style={[
-                      styles.animatedCoinContainer,
-                      createAnimatedStyle(goldAnimation),
-                    ]}
+                    style={[styles.animatedCoinContainer, createAnimatedStyle(goldAnimation)]}
                   >
                     <Image
                       source={require("../../assets/gold.png")}
@@ -410,16 +407,11 @@ function MainLanding() {
                 </View>
               </View>
             </View>
-
-            {/* Silver Rate Card */}
             <View style={styles.rateCard}>
               <View style={styles.rateCardContent}>
                 <View style={styles.rateIconContainer}>
                   <Animated.View
-                    style={[
-                      styles.animatedCoinContainer,
-                      createAnimatedStyle(silverAnimation),
-                    ]}
+                    style={[styles.animatedCoinContainer, createAnimatedStyle(silverAnimation)]}
                   >
                     <Image
                       source={require("../../assets/silver.png")}
@@ -437,55 +429,30 @@ function MainLanding() {
             </View>
           </View>
         </View>
-
         <Slider />
-
         <View style={styles.contentWrapper}>
-          <Text style={styles.contentText}>
-            Welcome to the Digital home of Jaiguru Jewellers:
-          </Text>
+          <Text style={styles.contentText}>Welcome to the Digital home of Jaiguru Jewellers:</Text>
           <Text style={styles.contentText1}>
-            The ideal place to join a savings scheme and save up to buy your
-            dream jewels. Jaiguru DIGIGOLD empowers you to save and buy jewels
-            conveniently in the palm of your hand. Start saving in gold from
-            today.
+            The ideal place to join a savings scheme and save up to buy your dream jewels. Jaiguru DIGIGOLD empowers you to save and buy jewels conveniently in the palm of your hand. Start saving in gold from today.
           </Text>
         </View>
-
         <View style={styles.titleSpacer}>
           <View style={styles.sectionHeaderContainer}>
-            <TextDefault
-              textColor={colors1.primaryText}
-              style={styles.titletext}
-              H5
-              bold
-            >
-              Your Schemes
-            </TextDefault>
+            <Text style={styles.titletext}>Your Schemes</Text>
             <TouchableOpacity onPress={() => navigation.navigate("MyScheme")}>
-              <TextDefault
-                textColor={colors1.primary}
-                H5
-                style={styles.viewAllText}
-              >
-                View All
-              </TextDefault>
+              <Text style={styles.viewAllText}>View All</Text>
             </TouchableOpacity>
           </View>
-
-          <ScrollView
+          <FlatList
+            data={loading ? [1, 2, 3] : productData}
+            keyExtractor={(item, index) => index.toString()}
             horizontal
             showsHorizontalScrollIndicator={false}
-            style={styles.productScrollContainer}
-          >
-            {loading ? (
-              <>
-                <ProductCardSkeleton />
-                <ProductCardSkeleton />
-                <ProductCardSkeleton />
-              </>
-            ) : productData && productData.length > 0 ? (
-              productData.map((item, index) => (
+            contentContainerStyle={styles.productScrollContainer}
+            renderItem={({ item, index }) =>
+              loading ? (
+                <ProductCardSkeleton key={index} style={{ width: 370, marginRight: 12 }} />
+              ) : (
                 <ProductCard
                   key={index}
                   productData={item}
@@ -494,47 +461,25 @@ function MainLanding() {
                   error={error}
                   navigation={navigation}
                   accountDetails={item.accountDetails}
+                  style={{ width: 370, marginRight: 12 }}
                 />
-              ))
-            ) : (
-              <TextDefault textColor={colors1.error}>
-                No Schemes available.
-              </TextDefault>
-            )}
-          </ScrollView>
+              )
+            }
+          />
         </View>
-
         <View style={styles.contentWrapper}>
           <Text style={styles.contentText}>Customized Gold Plans for You:</Text>
           <Text style={styles.contentText1}>
-            Choose from a range of Gold Plans with unique benefits to suit your
-            needs and convenience.
+            Choose from a range of Gold Plans with unique benefits to suit your needs and convenience.
           </Text>
         </View>
-
         <View style={styles.titleSpacer}>
           <View style={styles.sectionHeaderContainer}>
-            <TextDefault
-              textColor={colors1.primaryText}
-              style={styles.titletext}
-              H5
-              bold
-            >
-              Gold Plans
-            </TextDefault>
-            <TouchableOpacity
-              onPress={() => navigation.navigate("GoldPlanScreen")}
-            >
-              <TextDefault
-                textColor={colors1.primary}
-                H5
-                style={styles.viewAllText}
-              >
-                View All
-              </TextDefault>
+            <Text style={styles.titletext}>Gold Plans</Text>
+            <TouchableOpacity onPress={() => navigation.navigate("GoldPlanScreen")}>
+              <Text style={styles.viewAllText}>View All</Text>
             </TouchableOpacity>
           </View>
-
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
@@ -556,22 +501,13 @@ function MainLanding() {
                 />
               ))
             ) : (
-              <TextDefault textColor={colors1.error}>
-                No Gold Plans available.
-              </TextDefault>
+              <Text style={{ color: COLORS.danger }}>No Gold Plans available.</Text>
             )}
           </ScrollView>
         </View>
         <View style={styles.youtubeContainer}>
           <View style={styles.youtubeWrapper}>
-            <TextDefault
-              textColor={colors1.primaryText}
-              style={styles.titletext}
-              H5
-              bold
-            >
-              Promotions & Offers
-            </TextDefault>
+            <Text style={styles.titletext}>Promotions & Offers</Text>
           </View>
           <MainPageWithYouTube />
         </View>
@@ -582,7 +518,7 @@ function MainLanding() {
   return (
     <SafeAreaView style={[styles.flex, styles.safeAreaStyle]}>
       <ImageBackground
-        source={require("../../assets/bg.jpg")}
+        source={require("../../assets/bg2.jpg")}
         style={styles.mainBackground}
         imageStyle={styles.backgroundImageStyle}
       >

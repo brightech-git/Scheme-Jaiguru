@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, ImageBackground } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, ImageBackground, StyleSheet } from 'react-native';
 import BottomTab from '../../components/BottomTab/BottomTab';
-import { colors } from '../../utils';
 import GoldPlan from '../../ui/ProductCard/GoldPlans';
-import { StyleSheet } from 'react-native';
 import GoldPlansSkeleton from '../../components/SkeletonLoader/GoldPlansSkeleton';
 import { MaterialIcons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import appTheme from '../../utils/Theme';
+import { LinearGradient } from 'expo-linear-gradient';
+
+const { COLORS, SIZES, FONTS } = appTheme;
 
 function GoldPlanScreen({ navigation }) {
   const [schemes, setSchemes] = useState([]);
@@ -34,6 +36,32 @@ function GoldPlanScreen({ navigation }) {
     fetchSchemes();
   }, []);
 
+  // Custom Header Component
+  const CustomHeader = () => (
+    <LinearGradient
+      colors={COLORS.gradientPrimary}
+      style={styles.headerGradient}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 1 }}
+    >
+      <View style={styles.headerContent}>
+        <TouchableOpacity 
+          style={styles.backButton}
+          onPress={() => navigation.goBack()}
+        >
+          <MaterialIcons name="arrow-back" size={24} color={COLORS.title} />
+        </TouchableOpacity>
+
+        <View style={styles.headerTitleContainer}>
+          <Text style={styles.headerTitle}>Gold Plans</Text>
+          {/* <Text style={styles.headerSubtitle}>Choose your investment scheme</Text> */}
+        </View>
+
+        <View style={styles.headerRight} />
+      </View>
+    </LinearGradient>
+  );
+
   const renderContent = () => {
     if (loading) {
       return (
@@ -45,7 +73,15 @@ function GoldPlanScreen({ navigation }) {
     }
 
     if (!schemes || schemes.length === 0) {
-      return <Text style={styles.noDataText}>No Gold Plans available.</Text>;
+      return (
+        <View style={styles.noDataContainer}>
+          <MaterialIcons name="inventory" size={48} color={COLORS.textLight} />
+          <Text style={styles.noDataText}>No Gold Plans available</Text>
+          <Text style={styles.noDataSubtext}>
+            Check back later for new investment opportunities
+          </Text>
+        </View>
+      );
     }
 
     return schemes.map((scheme, index) => (
@@ -62,30 +98,29 @@ function GoldPlanScreen({ navigation }) {
   return (
     <View style={styles.container}>
       <ImageBackground
-        source={require('../../assets/bg.jpg')}
+        source={require('../../assets/bg2.jpg')}
         style={styles.mainBackground}
         imageStyle={styles.backgroundImageStyle}
       >
         <SafeAreaView style={styles.safeArea}>
-          {/* Back Button */}
-          <TouchableOpacity 
-            style={styles.backButton}
-            onPress={() => navigation.goBack()}
-          >
-            <MaterialIcons name="arrow-back" size={24} color={colors.textBlueColor} />
-          </TouchableOpacity>
-
-          {/* Title */}
-          <View style={styles.titleContainer}>
-            <Text style={styles.titleText}>Your Gold Plans</Text>
-          </View>
+          {/* Custom Header */}
+          <CustomHeader />
 
           {/* Content */}
           <ScrollView 
             showsVerticalScrollIndicator={false}
             contentContainerStyle={styles.scrollContent}
           >
-            {renderContent()}
+            <View style={styles.contentContainer}>
+              <View style={styles.welcomeSection}>
+                <Text style={styles.welcomeTitle}>Your Investment Portfolio</Text>
+                <Text style={styles.welcomeSubtitle}>
+                  Explore our premium gold investment schemes tailored for your financial growth
+                </Text>
+              </View>
+
+              {renderContent()}
+            </View>
           </ScrollView>
 
           {/* Bottom Navigation */}
@@ -99,7 +134,6 @@ function GoldPlanScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.white,
   },
   mainBackground: {
     flex: 1,
@@ -112,35 +146,115 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
   },
-  backButton: {
-    position: 'absolute',
-    top: 10,
-    left: 15,
-    zIndex: 1,
-    padding: 10,
+  // Header Styles
+  headerGradient: {
+    paddingTop: SIZES.padding * 2,
+    paddingBottom: SIZES.padding,
+    borderBottomLeftRadius: SIZES.radius_lg,
+    borderBottomRightRadius: SIZES.radius_lg,
+    elevation: 8,
+    shadowColor: COLORS.shadow,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
   },
-  titleContainer: {
+  headerContent: {
+    flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 60,
-    marginBottom: 20,
+    justifyContent: 'space-between',
+    paddingHorizontal: SIZES.padding,
   },
-  titleText: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: colors.titleText,
+  backButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: COLORS.background,
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 2,
+    shadowColor: COLORS.shadow,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
   },
+  headerTitleContainer: {
+    flex: 1,
+    alignItems: 'center',
+    marginHorizontal: SIZES.margin,
+  },
+  headerTitle: {
+    ...FONTS.h4,
+    color: COLORS.title,
+    textAlign: 'center',
+    marginBottom: 2,
+  },
+  headerSubtitle: {
+    ...FONTS.fontXs,
+    color: COLORS.text,
+    textAlign: 'center',
+  },
+  headerRight: {
+    width: 40,
+  },
+  // Content Styles
   scrollContent: {
     flexGrow: 1,
-    paddingHorizontal: 15,
-    paddingBottom: 20,
+    paddingBottom: SIZES.padding * 2,
+  },
+  contentContainer: {
+    paddingHorizontal: SIZES.padding,
+  },
+  welcomeSection: {
+    backgroundColor: COLORS.card,
+    borderRadius: SIZES.radius,
+    padding: SIZES.padding,
+    marginBottom: SIZES.margin,
+    elevation: 3,
+    shadowColor: COLORS.shadow,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.2,
+    shadowRadius: 6,
+  },
+  welcomeTitle: {
+    ...FONTS.h5,
+    color: COLORS.title,
+    textAlign: 'center',
+    marginBottom: SIZES.margin / 2,
+  },
+  welcomeSubtitle: {
+    ...FONTS.fontSm,
+    color: COLORS.textLight,
+    textAlign: 'center',
+    lineHeight: 20,
   },
   itemCardContainer: {
-    marginBottom: 15,
+    marginBottom: SIZES.margin,
+  },
+  noDataContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: SIZES.padding * 3,
+    backgroundColor: COLORS.card,
+    borderRadius: SIZES.radius,
+    margin: SIZES.margin,
+    elevation: 2,
+    shadowColor: COLORS.shadow,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
   },
   noDataText: {
-    color: colors.redColor,
+    ...FONTS.h6,
+    color: COLORS.text,
     textAlign: 'center',
-    padding: 20,
+    marginTop: SIZES.margin,
+    marginBottom: SIZES.margin / 2,
+  },
+  noDataSubtext: {
+    ...FONTS.fontXs,
+    color: COLORS.textLight,
+    textAlign: 'center',
+    paddingHorizontal: SIZES.padding,
   },
 });
 

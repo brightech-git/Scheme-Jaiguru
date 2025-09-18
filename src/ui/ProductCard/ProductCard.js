@@ -7,8 +7,10 @@ import {
 } from 'react-native'
 import { LinearGradient } from 'expo-linear-gradient'
 import { TextDefault } from '../../components'
-import { alignment, colors, scale } from '../../utils'
-import { colors1 } from '../../utils/colors'
+import appTheme from '../../utils/Theme'
+import { scale } from '../../utils'
+
+const { COLORS, SIZES, FONTS } = appTheme
 
 function ProductCard({
   productData,
@@ -16,22 +18,23 @@ function ProductCard({
   error,
   navigation,
   status,
-  accountDetails
+  accountDetails,
+  style, // ✅ new prop
 }) {
   if (loading) {
     return (
       <ActivityIndicator
-        size='large'
-        color={colors.greenColor}
-        style={{ marginTop: 20 }}
+        size="large"
+        color={COLORS.success}
+        style={{ marginTop: scale(20) }}
       />
     )
   }
 
   if (error) {
     return (
-      <View style={{ alignItems: 'center', marginTop: 20 }}>
-        <TextDefault style={{ color: colors.redColor }}>{error}</TextDefault>
+      <View style={{ alignItems: 'center', marginTop: scale(20) }}>
+        <TextDefault style={{ color: COLORS.error }}>{error}</TextDefault>
       </View>
     )
   }
@@ -49,23 +52,22 @@ function ProductCard({
   const isDreamGoldPlan =
     accountDetails?.schemeSummary?.schemeName?.trim() === 'DREAM GOLD PLAN'
 
-  return (
+ return (
     <TouchableOpacity
       activeOpacity={0.9}
       onPress={() =>
         navigation.navigate('ProductDescription', {
           productData,
           status,
-          accountDetails
+          accountDetails,
         })
       }
-      style={styles.cardContainer}
+      style={[styles.cardContainer, style]} // ✅ merged style
     >
-      {/* 🔥 Gradient Background */}
       <LinearGradient
-        colors={[colors1.gradientcolor2, colors1.gradientcolor1]}
-        start={{ x: 0, y: 0 }} // Top
-        end={{ x: 0, y: 1 }} // Bottom
+        colors={[COLORS.gradientcolor1, COLORS.gradientcolor2]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 0, y: 1 }}
         style={styles.gradientBackground}
       >
         {/* Top Section */}
@@ -74,7 +76,7 @@ function ProductCard({
             <TextDefault style={styles.text} bold>
               {productData.groupcode} - {productData.regno}
               {isDreamGoldPlan && (
-                <TextDefault style={[styles.text, { marginLeft: 10 }]}>
+                <TextDefault style={[styles.text, { marginLeft: scale(10) }]}>
                   / ₹{accountDetails?.amount || 0}
                 </TextDefault>
               )}
@@ -88,7 +90,7 @@ function ProductCard({
           </View>
         </View>
 
-        {/* Status Section */}
+        {/* Status */}
         <View style={styles.statusContainer}>
           <TextDefault style={styles.text} bold>
             {status}
@@ -96,7 +98,7 @@ function ProductCard({
           <View
             style={[
               styles.statusDot,
-              { backgroundColor: status === 'Active' ? '#4CAF50' : '#F44336' }
+              { backgroundColor: status === 'Active' ? COLORS.success : COLORS.error }
             ]}
           />
         </View>
@@ -120,7 +122,7 @@ function ProductCard({
               <TextDefault style={[styles.text, styles.headerText]}>
                 {isDreamGoldPlan
                   ? `${accountDetails?.schemeSummary?.schemaSummaryTransBalance?.insPaid || 0} / ${accountDetails?.schemeSummary?.instalment || 0}`
-                  : `${productData.amountWeight?.Weight || 0} grams`}
+                  : `${productData.amountWeight?.Weight || 0} g`}
               </TextDefault>
             </View>
             <View style={styles.valueTextContainer}>
@@ -131,12 +133,12 @@ function ProductCard({
           </View>
         </View>
 
-        {/* Yellow Line Below Center Section */}
-        <View style={styles.yellowLine} />
+        {/* Divider */}
+        {/* <View style={styles.divider} /> */}
 
         {/* Bottom Section */}
         <View style={styles.bottomSection}>
-          {/* Circle Section */}
+          {/* Circle */}
           <View style={styles.circleContainer}>
             <View style={styles.weightCircle}>
               <TextDefault style={styles.weightText}>
@@ -145,22 +147,20 @@ function ProductCard({
               <TextDefault style={styles.weightValue}>
                 {isDreamGoldPlan
                   ? `₹${accountDetails?.schemeSummary?.schemaSummaryTransBalance?.amtrecd || 0}`
-                  : `${productData.amountWeight?.Weight || 0} grams`}
+                  : `${productData.amountWeight?.Weight || 0} g`}
               </TextDefault>
             </View>
           </View>
 
-          {/* Maturity Date Section */}
+          {/* Maturity Date */}
           <View style={styles.dateContainer}>
-            <TextDefault style={styles.maturityText}>
-              Date of Maturity
-            </TextDefault>
+            <TextDefault style={styles.maturityText}>Date of Maturity</TextDefault>
             <TextDefault style={styles.dateText}>
               {formatDate(productData.maturityDate)}
             </TextDefault>
           </View>
 
-          {/* Pay Button Section */}
+          {/* Buttons */}
           <View style={styles.buttonContainer}>
             <TouchableOpacity
               style={styles.payButton}
@@ -195,25 +195,26 @@ function ProductCard({
 }
 
 const styles = StyleSheet.create({
-  cardContainer: {
-    margin: scale(5),
-    borderRadius: scale(15),
-    overflow: 'hidden',
-    elevation: 6,
-    shadowColor: colors.white,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84
-  },
+ cardContainer: {
+  paddingTop: scale(7),
+  borderRadius: SIZES.radius_lg,
+  overflow: 'hidden',
+  elevation: 6,
+  shadowColor: COLORS.dark,
+  shadowOffset: { width: 0, height: 2 },
+  shadowOpacity: 0.25,
+  shadowRadius: 4,
+  // ❌ remove width: '100%'
+},
+
   gradientBackground: {
-    borderRadius: scale(15),
-    padding: scale(5)
+    borderRadius: SIZES.radius_lg,
+    padding: SIZES.padding / 2
   },
   topSection: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: scale(20),
-    ...alignment.Psmall
+    marginBottom: scale(20)
   },
   rightTop: {
     alignItems: 'flex-end'
@@ -229,13 +230,12 @@ const styles = StyleSheet.create({
     width: scale(8),
     height: scale(8),
     borderRadius: scale(4),
-    marginLeft: scale(5)
+    marginLeft: scale(6)
   },
   centerSection: {
     paddingVertical: scale(15),
-    borderRadius: scale(5),
-    marginBottom: scale(5),
-    ...alignment.PxSmall
+    borderRadius: SIZES.radius_sm,
+    marginBottom: scale(8)
   },
   headerRow: {
     flexDirection: 'row',
@@ -244,7 +244,7 @@ const styles = StyleSheet.create({
   valueRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginTop: scale(5)
+    marginTop: scale(6)
   },
   headerTextContainer: {
     flex: 1,
@@ -257,8 +257,7 @@ const styles = StyleSheet.create({
   bottomSection: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
-    ...alignment.PxSmall
+    alignItems: 'center'
   },
   circleContainer: {
     alignItems: 'center'
@@ -266,13 +265,13 @@ const styles = StyleSheet.create({
   weightCircle: {
     width: scale(75),
     height: scale(75),
-    borderRadius: scale(70),
-    backgroundColor: colors.radioColor,
+    borderRadius: scale(75 / 2),
+    backgroundColor: COLORS.card,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: scale(10),
-    borderWidth: 5,
-    borderColor: '#eab308'
+    padding: scale(8),
+    borderWidth: 2,
+    borderColor: COLORS.accent
   },
   dateContainer: {
     flex: 1,
@@ -281,85 +280,66 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
   maturityText: {
-    color: colors.greenColor,
+    color: COLORS.text,
     fontSize: scale(12),
     textAlign: 'center',
-    fontWeight: 'bold'
+    fontWeight: FONTS.heading.fontWeight
   },
   dateText: {
-    color: colors.greenColor,
+    color: COLORS.text,
     fontSize: scale(10),
     marginTop: scale(2),
     textAlign: 'center',
-    fontWeight: 'bold'
+    fontWeight: FONTS.heading.fontWeight
   },
   buttonContainer: {
     flex: 1,
     justifyContent: 'center',
     marginLeft: scale(10),
     flexDirection: 'row',
-    gap: 10
+    gap: scale(8),
+    marginTop: scale(16)
   },
   payButton: {
-    backgroundColor: colors.white,
-    paddingVertical: scale(5),
-    paddingHorizontal: scale(10),
-    borderRadius: scale(5),
+    backgroundColor: COLORS.white,
+    paddingVertical: scale(6),
+    paddingHorizontal: scale(6),
+    borderRadius: SIZES.radius_sm,
     justifyContent: 'center',
     alignItems: 'center',
-    alignSelf: 'flex-start',
     marginBottom: scale(10)
   },
   text: {
-    color: colors.greenColor,
+    color: COLORS.title,
     fontSize: scale(12),
-    fontWeight: 'bold'
-  },
-  bold: {
-    fontWeight: 'bold'
+    fontWeight: FONTS.heading.fontWeight
   },
   weightText: {
-    color: colors.fontMainColor,
-    fontSize: scale(7),
+    color: COLORS.text,
+    fontSize: scale(8),
     textAlign: 'center',
-    fontWeight: 'bold'
+    fontWeight: FONTS.heading.fontWeight
   },
   weightValue: {
-    color: colors.fontMainColor,
-    fontSize: scale(8),
-    fontWeight: 'bold',
+    color: COLORS.title,
+    fontSize: scale(10),
+    fontWeight: FONTS.heading.fontWeight,
     textAlign: 'center'
   },
   payButtonText: {
-    color: colors.fontMainColor,
-    fontSize: 12,
-    fontWeight: 'bold'
-  },
-  yellowLine: {
-    height: scale(2),
-    backgroundColor: colors.greenColor,
-    borderRadius: scale(1),
-    marginBottom: scale(10)
-  },
-  accountDetailsSection: {
-    padding: scale(10),
-    backgroundColor: colors.lightGray,
-    borderRadius: scale(5),
-    marginBottom: scale(10)
-  },
-  detailRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: scale(5)
-  },
-  detailLabel: {
-    color: colors.fontMainColor,
-    fontSize: scale(12)
-  },
-  detailValue: {
-    color: colors.fontSecondColor,
+    color: COLORS.dark,
     fontSize: scale(12),
-    fontWeight: '600'
+    fontWeight: FONTS.heading.fontWeight,
+
+    padding: scale(4),
+   
+    borderRadius: SIZES.radius_sm
+  },
+  divider: {
+    height: scale(2),
+    backgroundColor: COLORS.text,
+    borderRadius: scale(2),
+    marginBottom: scale(10)
   }
 })
 

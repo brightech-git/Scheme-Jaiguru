@@ -2,49 +2,60 @@ import { Dimensions } from "react-native";
 const { width, height } = Dimensions.get("screen");
 
 export const COLORS = {
-  primary: "#C5A572", // Elegant muted gold
-  primaryLight: "rgba(197, 165, 114, 0.25)",
-  secondary: "#8C6C3F", // Rich bronze
-  success: "#2E7D32", // Emerald green
-  danger: "#C62828", // Ruby red
-  warning: "#E6A93D", // Amber gold
-  dark: "#1E1E1E", // Charcoal black
-  light: "#FAFAFA", // Light ivory
-  info: "#2E6F95", // Sapphire blue
-  white: "#FFFFFF",
-  label: "#6E6E6E",
-  backgroundColor: "#FFFFFF",
-  black: "#000000",
-  notification: "#D4AF37", // Classic gold
+  // Base
+  background: "#000000",   // main app background (black)
+  card: "#1A1A1A",         // card containers
+  surface: "#121212",      // elevated surfaces
+  surfaceVariant: "#1E1E1E",
 
-  // light theme
-  card: "#F9F6F1",
-  background: "#FFFFFF",
-  text: "#2C2C2C",
-  textLight: "#7C7C7C",
-  title: "#1B1B1B",
-  borderColor: "#E0D9CF",
-  input: "#FAF5ED",
-  placeholder: "rgba(0, 0, 0, 0.5)",
-  darkLight: "#4E4E4E",
+  // Core Brand
+  primary: "#D4AF37",      // luxury gold (buttons, highlights)
+  primaryLight: "rgba(212, 175, 55, 0.2)", // subtle gold tint
+  secondary: "#8C6C3F",    // bronze accent
+  notification: "#FFD700", // bright gold for alerts
 
-  // dark theme
-  darkCard: "#2A2A2A",
-  darkBackground: "#121212",
-  darkText: "#F5F5F5",
-  darkTextLight: "#C5C5C5",
-  darkTitle: "#FFFFFF",
-  darkBorder: "rgba(255, 255, 255, 0.15)",
+  // Status
+  success: "#4CAF50",      // emerald green (positive)
+  danger: "#E53935",       // ruby red (negative)
+  warning: "#FFC107",      // amber yellow
+  info: "#29B6F6",         // sapphire blue
+
+  // Text
+  title: "#FFD700",        // gold titles
+  text: "#F5F5F5",         // main text (white-ish)
+  textLight: "#B0B0B0",    // secondary text (muted grey)
+  label: "#A0A0A0",        // for inputs, captions
+  placeholder: "rgba(255, 255, 255, 0.5)",
+  white:"#FFFFFF",
+
+  // Borders & Shadows
+  borderColor: "rgba(255, 255, 255, 0.1)",
+  outline: "#2A2A2A",
+  shadow: "rgba(0, 0, 0, 0.6)",
+  overlay: "rgba(0, 0, 0, 0.7)",
+
+  // Inputs
+  input: "#6E6E6E",        // dark input field
   darkInput: "#1E1E1E",
-  darkBorderColor: "rgba(255, 255, 255, 0.15)",
-  darkPlaceholder: "rgba(255, 255, 255, 0.5)",
 
-  // semantic
-  surface: "#FFFFFF",
-  surfaceVariant: "#F5EFE6",
-  outline: "#D6C7B5",
-  shadow: "rgba(0, 0, 0, 0.12)",
-  overlay: "rgba(0, 0, 0, 0.5)",
+  
+  // Icons
+  iconPrimary: '#C5A572',
+  iconSecondary: '#6E6E6E',
+
+  // Gradients
+  gradientPrimary: ['#C5A572', '#8C6C3F'], // React Native
+  gradientSecondary: ['rgba(197,165,114,0.25)', '#C5A572'],
+  gradientText: ['#2E6F95', '#C62828'], // sapphire → ruby
+  gradientBackground: "linear-gradient(135deg, #C5A572, #8C6C3F)", // Web CSS
+
+  // Productcard
+  gradientcolor1: "#ac7826ff",   // muted gold
+  gradientcolor2: "#8C6C3F",   // bronze
+
+  // Goldplan
+  gradientcolor3: "#D4AF37",   // classic gold
+  gradientcolor4: "#2E7D32",   // emerald green
 };
 
 export const SIZES = {
@@ -73,9 +84,9 @@ export const SIZES = {
   // App dimensions
   width,
   height,
-
   container: 800,
 };
+
 
 export const FONTS = {
   // Paragraph styles
@@ -114,7 +125,7 @@ export const FONTS = {
   h2: {
     fontSize: SIZES.h2,
     color: COLORS.title,
-    fontFamily: "TrajanPro",
+    fontFamily: "TrajanProBold",
     lineHeight: 36,
   },
   h3: {
@@ -131,14 +142,13 @@ export const FONTS = {
   },
   h5: {
     fontSize: SIZES.h5,
-    color: COLORS.title,
-    fontFamily: "Poppins-Bold",
+    fontFamily: "DMSerif",
     lineHeight: 26,
   },
   h6: {
     fontSize: SIZES.h6,
     color: COLORS.title,
-    fontFamily: "Poppins-Bold",
+    fontFamily: "DMSerif",
     lineHeight: 24,
   },
 

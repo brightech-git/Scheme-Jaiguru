@@ -5,7 +5,7 @@ import { colors } from './src/utils/colors';
 import FlashMessage from 'react-native-flash-message';
 import * as Notifications from 'expo-notifications';
 import { registerForPushNotificationsAsync } from './src/utils/Notification';
-
+import { SafeAreaView } from 'react-native-safe-area-context';
 // expo-font
 import { useFonts } from 'expo-font';
 
@@ -52,11 +52,13 @@ export default function App() {
 
   return (
     <>
-      <StatusBar
-        barStyle="dark-content"
-        backgroundColor={colors.headerbackground}
-      />
-      <AppContainer />
+      <SafeAreaView style={{ flex: 1 }}>
+        <StatusBar
+          barStyle="dark-content"
+          backgroundColor={colors.headerbackground}
+        />
+        <AppContainer />
+      </SafeAreaView>
       <FlashMessage position="top" />
     </>
   );

@@ -161,7 +161,7 @@ const AllSchemesScreen = ({ navigation }) => {
     <View style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
       <ImageBackground
-        source={require("../../assets/otpbg.jpg")}
+        source={require("../../assets/otpbg2.jpg")}
         style={styles.mainBackground}
         imageStyle={styles.backgroundImageStyle}
       >

@@ -3,31 +3,31 @@ import { View, TouchableOpacity, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { TextDefault } from '../../components';
-import { alignment, colors, scale } from '../../utils';
-import { colors1 } from '../../utils/colors';
+import { alignment, scale } from '../../utils';
+import appTheme from '../../utils/Theme';
+
+const { COLORS, SIZES, FONTS } = appTheme;
 
 function GoldPlan(props) {
   const { schemeId, schemeName, description = 'No description available' } = props;
   const navigation = useNavigation();
 
-  // ✅ Only render schemeId = 5 (Dream Gold Plan)
-  // if (schemeId !== 5) {
-    // return null;
-  // }
-
   return (
-    <TouchableOpacity style={[styles.cardContainer, props.styles]}>
+    <TouchableOpacity 
+      style={[styles.cardContainer, props.styles]}
+      activeOpacity={0.7}
+    >
       {/* 🔥 Gradient Background */}
       <LinearGradient
-        colors={[colors1.gradientcolor3, colors1.gradientcolor4]}
+        colors={COLORS.gradientPrimary}
         start={{ x: 0, y: 0 }}
-        end={{ x: 0, y: 1 }}
+        end={{ x: 1, y: 1 }}
         style={styles.gradientBackground}
       >
         {/* Top Section */}
         <View style={styles.topSection}>
           <View style={styles.rightTop}>
-            <TextDefault style={styles.text} bold>
+            <TextDefault style={styles.schemeNameText} bold>
               {schemeName}
             </TextDefault>
           </View>
@@ -35,7 +35,7 @@ function GoldPlan(props) {
 
         {/* Center Section */}
         <View style={styles.centerSection}>
-          <TextDefault style={styles.description}>
+          <TextDefault style={styles.descriptionText}>
             {description}
           </TextDefault>
         </View>
@@ -43,17 +43,17 @@ function GoldPlan(props) {
         {/* Bottom Section */}
         <View style={styles.bottomSection}>
           <TouchableOpacity
-            style={styles.payButton}
+            style={styles.knowMoreButton}
             onPress={() => navigation.navigate('KnowMore', { schemeId })}
           >
-            <TextDefault style={styles.payButtonText}>Know More</TextDefault>
+            <TextDefault style={styles.knowMoreButtonText}>Know More</TextDefault>
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={styles.payButton}
+            style={styles.joinButton}
             onPress={() => navigation.navigate('AddNewMember', { schemeId })}
           >
-            <TextDefault style={styles.payButtonText}>Join Scheme</TextDefault>
+            <TextDefault style={styles.joinButtonText}>Join Scheme</TextDefault>
           </TouchableOpacity>
         </View>
       </LinearGradient>
@@ -63,60 +63,81 @@ function GoldPlan(props) {
 
 const styles = StyleSheet.create({
   cardContainer: {
-    borderRadius: scale(15),
+    borderRadius: SIZES.radius_lg,
     overflow: 'hidden',
+    elevation: 4,
+    shadowColor: COLORS.shadow,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
   },
   gradientBackground: {
-    borderRadius: scale(15),
-    padding: scale(5),
+    borderRadius: SIZES.radius_lg,
+    padding: SIZES.padding,
     overflow: 'hidden',
   },
   topSection: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: scale(20),
-    ...alignment.Psmall,
+    marginBottom: SIZES.margin,
   },
   rightTop: {
     alignItems: 'flex-end',
   },
   centerSection: {
-    marginBottom: scale(5),
-    ...alignment.Psmall,
+    marginBottom: SIZES.margin / 2,
   },
   bottomSection: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginTop: scale(10),
+    marginTop: SIZES.margin,
   },
-  payButton: {
-    backgroundColor: colors.white,
-    paddingVertical: scale(5),
-    paddingHorizontal: scale(10),
-    borderRadius: scale(5),
+  knowMoreButton: {
+    backgroundColor: COLORS.primaryLight,
+    paddingVertical: SIZES.padding / 2,
+    paddingHorizontal: SIZES.padding,
+    borderRadius: SIZES.radius_sm,
+    borderWidth: 1,
+    borderColor: COLORS.primary,
+    flex: 1,
+    marginRight: SIZES.margin / 2,
   },
-  text: {
-    color: colors.greenColor,
-    fontSize: scale(12),
-    fontWeight: 'bold',
+  joinButton: {
+    backgroundColor: COLORS.primary,
+    paddingVertical: SIZES.padding / 2,
+    paddingHorizontal: SIZES.padding,
+    borderRadius: SIZES.radius_sm,
+    flex: 1,
+    marginLeft: SIZES.margin / 2,
+    elevation: 2,
+    shadowColor: COLORS.shadow,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
   },
-  payButtonText: {
-    color: colors.black,
-    fontSize: 13,
-    fontWeight: 'bold',
+  schemeNameText: {
+    ...FONTS.h5,
+    color: COLORS.white,
+    textAlign: 'right',
+  },
+  descriptionText: {
+    ...FONTS.font,
+    color: COLORS.text,
+    textAlign: 'center',
+    marginBottom: SIZES.margin,
+  },
+  knowMoreButtonText: {
+    ...FONTS.h5,
+    color: COLORS.notification,
+    fontWeight: '600',
     textAlign: 'center',
   },
-  description: {
-    color: colors.greenColor,
-    fontSize: 14,
-    marginBottom: 20,
-    fontWeight: 'bold',
-  },
-  schemeText: {
-    color: colors.greenColor,
-    fontSize: 14,
-    marginTop: 5,
+  joinButtonText: {
+    ...FONTS.h5,
+    color: COLORS.white,
+    fontWeight: '600',
+    textAlign: 'center',
   },
 });
 

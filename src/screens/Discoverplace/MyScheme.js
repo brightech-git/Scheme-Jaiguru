@@ -42,8 +42,10 @@ function DiscoverPlace({ navigation }) {
 
   useEffect(() => {
     const fetchPhoneSearchData = async () => {
-      const storedPhoneNumber = await AsyncStorage.getItem('userPhoneNumber');
-      console.log(storedPhoneNumber)
+      // await AsyncStorage.setItem("userPhoneNumber", phoneNumber);
+const storedPhoneNumber = await AsyncStorage.getItem("userPhoneNumber"); // ✅ will have value
+      console.log("Stored phone:", storedPhoneNumber);
+
       try {
         const phoneResponse = await fetch(`https://akj.brightechsoftware.com/v1/api/account/phonesearch?phoneNo=${storedPhoneNumber}`, {
           method: 'GET',
@@ -141,22 +143,24 @@ function DiscoverPlace({ navigation }) {
   return (
     <View style={styles.container}>
       <ImageBackground
-        source={require('../../assets/bg.jpg')}
+        source={require('../../assets/bg2.jpg')}
         style={styles.mainBackground}
         imageStyle={styles.backgroundImageStyle}
       >
         <SafeAreaView style={styles.safeArea}>
           {/* Back Button */}
-          <TouchableOpacity 
-            style={styles.backButton}
-            onPress={() => navigation.goBack()}
-          >
-            <MaterialIcons name="arrow-back" size={24} color={colors.textBlueColor} />
-          </TouchableOpacity>
+          <View style={styles.backButtonContainer}>
+            <TouchableOpacity
+              style={styles.backButton}
+              onPress={() => navigation.goBack()}
+            >
+              <MaterialIcons name="arrow-back" size={24} color={colors.textBlueColor} />
+            </TouchableOpacity>
 
           {/* Title */}
           <View style={styles.titleContainer}>
             <Text style={styles.titleText}>Your Schemes</Text>
+          </View>
           </View>
 
           <ScrollView

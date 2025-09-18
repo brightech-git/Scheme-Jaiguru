@@ -8,16 +8,18 @@ export default StyleSheet.create({
     flex: 1,
     width: '100%',
     height: '100%',
+    backgroundColor: COLORS.base, // base black background
   },
   backgroundImageStyle: {
-    opacity: 0.9,
+    // opacity: 0.2, // faded background image so text pops
   },
   container: {
     flex: 1,
-    backgroundColor: COLORS.white,
+    // backgroundColor: COLORS.base, // base theme color
   },
   safeArea: {
     flex: 1,
+    // backgroundColor: COLORS.base,
   },
   backButton: {
     position: 'absolute',
@@ -25,6 +27,8 @@ export default StyleSheet.create({
     left: SIZES.padding,
     zIndex: 1,
     padding: SIZES.padding / 1.5,
+    backgroundColor: COLORS.primaryLight,
+    borderRadius: SIZES.radius,
   },
   titleContainer: {
     alignItems: 'center',
@@ -66,11 +70,13 @@ export default StyleSheet.create({
     borderRadius: SIZES.radius_lg,
     shadowColor: COLORS.dark,
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 5,
-    elevation: 5,
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 4,
     alignItems: 'center',
     padding: SIZES.padding / 1.5,
+    borderWidth: 1,
+    borderColor: COLORS.borderColor,
   },
   cardImage: {
     width: '100%',
@@ -103,6 +109,7 @@ export default StyleSheet.create({
     position: 'absolute',
     bottom: 0,
     width: '100%',
+    backgroundColor: COLORS.base,
   },
   buttonRow: {
     flexDirection: 'row',
@@ -114,7 +121,7 @@ export default StyleSheet.create({
   tripButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: COLORS.primaryLight,
+    backgroundColor: COLORS.primary,
     paddingVertical: SIZES.padding / 1.5,
     paddingHorizontal: SIZES.padding / 2,
     borderRadius: SIZES.radius,
@@ -123,7 +130,7 @@ export default StyleSheet.create({
     fontSize: SIZES.fontSm,
     fontFamily: FONTS.fontSm.fontFamily,
     lineHeight: FONTS.fontSm.lineHeight,
-    color: COLORS.text,
+    color: COLORS.white,
     marginRight: SIZES.margin / 2,
     fontWeight: FONTS.heading.fontWeight,
   },
@@ -142,7 +149,7 @@ export default StyleSheet.create({
     width: 30,
     height: 30,
     borderRadius: 15,
-    backgroundColor: COLORS.primaryLight,
+    backgroundColor: COLORS.secondary,
     justifyContent: 'center',
     alignItems: 'center',
     zIndex: 1,

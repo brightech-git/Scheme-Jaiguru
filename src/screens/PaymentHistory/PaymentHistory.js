@@ -6,12 +6,18 @@ import {
   FlatList,
   StyleSheet,
   TouchableOpacity,
+  Alert,
+  Dimensions,
+  ImageBackground
 } from 'react-native';
-import { BackHeader } from '../../components';
-import { colors, scale } from '../../utils';
+import { scale } from '../../utils';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import { colors1 } from '../../utils/colors';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import appTheme from '../../utils/Theme';
 import { LinearGradient } from 'expo-linear-gradient';
+
+const { COLORS, SIZES, FONTS } = appTheme;
+const { width } = Dimensions.get('window');
 
 const PaymentHistory = ({ navigation, route }) => {
   const { accountDetails, schemeName } = route.params;
@@ -27,13 +33,13 @@ const PaymentHistory = ({ navigation, route }) => {
       const date = new Date(dateTimeString);
       if (isNaN(date.getTime())) return 'Invalid Date';
       return (
-        date.toLocaleDateString('en-GB', {
+        date.toLocaleDateString('en-IN', {
           day: '2-digit',
           month: 'short',
           year: 'numeric',
         }) +
         ' ' +
-        date.toLocaleTimeString('en-GB', {
+        date.toLocaleTimeString('en-IN', {
           hour: '2-digit',
           minute: '2-digit',
           hour12: true,
@@ -50,7 +56,7 @@ const PaymentHistory = ({ navigation, route }) => {
     try {
       const date = new Date(dateString);
       if (isNaN(date.getTime())) return 'Invalid Date';
-      return date.toLocaleDateString('en-GB', {
+      return date.toLocaleDateString('en-IN', {
         day: '2-digit',
         month: 'short',
         year: 'numeric',
@@ -105,12 +111,12 @@ const PaymentHistory = ({ navigation, route }) => {
         <View style={styles.transactionLeft}>
           <View style={[
             styles.statusBadge,
-            { backgroundColor: isPaid ? colors1.success : colors1.warning },
+            { backgroundColor: isPaid ? COLORS.success : COLORS.warning },
           ]}>
             <Icon
               name={isPaid ? 'check-circle' : 'clock-o'}
               size={20}
-              color={colors.white}
+              color={COLORS.text}
             />
           </View>
           <View style={styles.transactionDetails}>
@@ -124,49 +130,71 @@ const PaymentHistory = ({ navigation, route }) => {
         <View style={styles.transactionRight}>
           <Text style={[
             styles.transactionAmount,
-            !isPaid && { color: colors1.warning },
+            !isPaid && { color: COLORS.warning },
           ]}>
-            ₹ {item.amount}
+            ₹ {item.amount?.toLocaleString?.('en-IN') || item.amount}
           </Text>
           <Text style={[
             styles.statusText,
-            { color: isPaid ? colors1.success : colors1.warning },
+            { color: isPaid ? COLORS.success : COLORS.warning },
           ]}>
             {isPaid ? 'Paid' : 'Pending'}
           </Text>
         </View>
       </TouchableOpacity>
     );
-  }, [formatDateTime]);
+  }, [formatDateTime, paymentHistory.length]);
+
+  // Custom header component
+  const CustomHeader = () => (
+    <View style={styles.customHeader}>
+      <TouchableOpacity
+        style={styles.backButton}
+        onPress={() => navigation.goBack()}
+        activeOpacity={0.7}
+      >
+        <MaterialIcons name="arrow-back" size={24} color={COLORS.primary} />
+      </TouchableOpacity>
+      
+      <Text style={styles.headerTitle}>Payment History</Text>
+      
+      <TouchableOpacity
+        style={styles.sortButton}
+        onPress={() => setSortOrder(sortOrder === 'desc' ? 'asc' : 'desc')}
+        activeOpacity={0.7}
+      >
+        <Icon
+          name={sortOrder === 'desc' ? 'sort-amount-desc' : 'sort-amount-asc'}
+          size={20}
+          color={COLORS.primary}
+        />
+      </TouchableOpacity>
+    </View>
+  );
 
   return (
+    <ImageBackground
+      source={require('../../assets/bg2.jpg')}
+      style={styles.background}
+    >
     <SafeAreaView style={styles.container}>
       <LinearGradient
-        colors={[colors1.primary, colors1.primaryDark]}
+        colors={COLORS.gradientPrimary}
         style={styles.headerGradient}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
       >
-        <View style={styles.header}>
-          <BackHeader
-            title="Payment History"
-            backPressed={() => navigation.goBack()}
-            titleColor={colors.white}
-          />
-          <TouchableOpacity
-            style={styles.sortButton}
-            onPress={() => setSortOrder(sortOrder === 'desc' ? 'asc' : 'desc')}
-          >
-            <Icon
-              name={sortOrder === 'desc' ? 'sort-amount-desc' : 'sort-amount-asc'}
-              size={20}
-              color={colors.white}
-            />
-          </TouchableOpacity>
-        </View>
+        <CustomHeader />
 
         <View style={styles.headerCard}>
-          <Text style={styles.schemeName}>
+          <View style={styles.schemeIconContainer}>
+          <Text style={styles.schemeName1}>
             {schemeName || 'Scheme Payment History'}
           </Text>
+          <Text style={styles.schemeName}>
+            {accountDetails?.schemeSummary?.schemeName || 'Scheme Payment History'}
+          </Text>
+          </View>
           <View style={styles.headerStats}>
             <View style={styles.statItem}>
               <Text style={styles.statValue}>
@@ -205,7 +233,7 @@ const PaymentHistory = ({ navigation, route }) => {
             />
           ) : (
             <View style={styles.emptyState}>
-              <Icon name="inbox" size={48} color={colors1.borderLight} />
+              <Icon name="file-text" size={48} color={COLORS.borderColor} />
               <Text style={styles.emptyStateText}>No transactions found</Text>
               <Text style={styles.emptyStateSubtext}>
                 Your payment history will appear here
@@ -215,53 +243,84 @@ const PaymentHistory = ({ navigation, route }) => {
         </View>
       </View>
     </SafeAreaView>
+     </ImageBackground>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors1.background,
+    // backgroundColor: COLORS.background,
+  },
+  background: {
+    flex: 1,
+    resizeMode: 'cover',
+    justifyContent: 'center',
+  },
+  customHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: SIZES.padding,
+    paddingVertical: 12,
+  },
+  backButton: {
+    padding: 4,
+    backgroundColor: COLORS.card,
+    borderRadius: 10,
+    // elevation: 2,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
+  },
+  headerTitle: {
+    ...FONTS.h4,
+    color: COLORS.title,
+    textAlign: 'center',
+    flex: 1,
+  },
+  sortButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: COLORS.primaryLight,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   headerGradient: {
-    paddingBottom: scale(20),
-    borderBottomLeftRadius: scale(30),
-    borderBottomRightRadius: scale(30),
+    paddingBottom: SIZES.padding * 1.5,
+    borderBottomLeftRadius: SIZES.radius_lg,
+    borderBottomRightRadius: SIZES.radius_lg,
     elevation: 8,
-    shadowColor: colors1.primaryDark,
+    shadowColor: COLORS.shadow,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
   },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: scale(20),
-    paddingTop: scale(10),
-  },
-  sortButton: {
-    width: scale(36),
-    height: scale(36),
-    borderRadius: scale(18),
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
   headerCard: {
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    marginHorizontal: scale(20),
-    marginTop: scale(10),
-    padding: scale(15),
-    borderRadius: scale(15),
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    marginHorizontal: SIZES.padding,
+    marginTop: SIZES.margin,
+    padding: SIZES.padding,
+    borderRadius: SIZES.radius,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.3)',
+    borderColor: 'rgba(255, 255, 255, 0.2)',
+  },
+  schemeIconContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: SIZES.margin,
+    justifyContent: 'space-between',
   },
   schemeName: {
-    fontSize: scale(18),
-    fontWeight: '600',
-    color: colors.white,
-    marginBottom: scale(12),
+    ...FONTS.h5,
+    color: COLORS.title,
+    marginBottom: SIZES.margin,
+    textAlign: 'center',
+  },
+  schemeName1: {
+    ...FONTS.h5,
+    color: COLORS.text,
+    marginBottom: SIZES.margin,
     textAlign: 'center',
   },
   headerStats: {
@@ -274,58 +333,58 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   statValue: {
-    fontSize: scale(16),
+    ...FONTS.h6,
     fontWeight: '600',
-    color: colors.white,
-    marginBottom: scale(4),
+    color: COLORS.title,
+    marginBottom: 4,
   },
   statLabel: {
-    fontSize: scale(12),
-    color: 'rgba(255, 255, 255, 0.9)',
+    ...FONTS.h6,
+    color: COLORS.placeholder,
     fontWeight: '500',
+    textAlign: 'center',
   },
   statDivider: {
     width: 1,
-    height: scale(35),
+    height: 35,
     backgroundColor: 'rgba(255, 255, 255, 0.3)',
   },
   content: {
     flex: 1,
-    padding: scale(20),
+    padding: SIZES.padding,
   },
   historySection: {
-    backgroundColor: colors.white,
-    borderRadius: scale(20),
-    padding: scale(20),
+    backgroundColor: COLORS.card,
+    borderRadius: SIZES.radius_lg,
+    padding: SIZES.padding,
     elevation: 3,
-    shadowColor: colors1.primaryDark,
+    shadowColor: COLORS.shadow,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.08,
     shadowRadius: 4,
   },
   historyTitle: {
-    fontSize: scale(18),
-    fontWeight: '600',
-    color: colors1.primaryText,
-    marginBottom: scale(15),
+    ...FONTS.h5,
+    color: COLORS.title,
+    marginBottom: SIZES.margin,
   },
   listContainer: {
-    paddingBottom: scale(20),
+    paddingBottom: SIZES.padding,
   },
   transactionCard: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: colors1.sectionBackground,
-    padding: scale(15),
-    borderRadius: scale(15),
-    marginBottom: scale(10),
+    backgroundColor: COLORS.surface,
+    padding: SIZES.padding,
+    borderRadius: SIZES.radius,
+    marginBottom: SIZES.margin / 2,
     borderWidth: 1,
     borderColor: 'transparent',
   },
   pendingCard: {
-    borderColor: colors1.warning,
-    backgroundColor: 'rgba(255, 193, 7, 0.1)',
+    borderColor: COLORS.warning,
+    backgroundColor: COLORS.primaryLight,
   },
   lastCard: {
     marginBottom: 0,
@@ -336,59 +395,58 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   statusBadge: {
-    width: scale(40),
-    height: scale(40),
-    borderRadius: scale(20),
-    backgroundColor: colors1.success,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: scale(12),
+    marginRight: SIZES.margin,
   },
   transactionDetails: {
     flex: 1,
   },
   transactionDate: {
-    fontSize: scale(14),
+    ...FONTS.subheading,
     fontWeight: '500',
-    color: colors1.primaryText,
-    marginBottom: scale(2),
+    color: COLORS.text,
+    marginBottom: 4,
   },
   transactionInstallment: {
-    fontSize: scale(12),
-    color: colors1.textSecondary,
+    ...FONTS.subheading,
+    color: COLORS.textLight,
   },
   receiptNo: {
-    fontSize: scale(10),
-    color: colors1.textSecondary,
-    marginTop: scale(2),
+    ...FONTS.subheading,
+    color: COLORS.textLight,
+    marginTop: 3,
   },
   transactionRight: {
     alignItems: 'flex-end',
   },
   transactionAmount: {
-    fontSize: scale(16),
+    ...FONTS.subheading,
     fontWeight: '700',
-    color: colors1.primary,
-    marginBottom: scale(2),
+    color: COLORS.primary,
+    marginBottom: 2,
   },
   statusText: {
-    fontSize: scale(11),
+    ...FONTS.subheading,
     fontWeight: '500',
   },
   emptyState: {
     alignItems: 'center',
-    paddingVertical: scale(40),
+    paddingVertical: SIZES.padding * 2,
   },
   emptyStateText: {
-    fontSize: scale(16),
+    ...FONTS.font,
     fontWeight: '600',
-    color: colors1.textSecondary,
-    marginTop: scale(15),
-    marginBottom: scale(5),
+    color: COLORS.textLight,
+    marginTop: SIZES.margin,
+    marginBottom: SIZES.margin / 3,
   },
   emptyStateSubtext: {
-    fontSize: scale(13),
-    color: colors1.textSecondary,
+    ...FONTS.fontXs,
+    color: COLORS.textLight,
     opacity: 0.7,
     textAlign: 'center',
   },

@@ -135,7 +135,7 @@ function MpinScreen({ route, navigation }) {
 
   return (
     <ImageBackground
-      source={require('../../assets/bg.jpg')}
+      source={require('../../assets/bg2.jpg')}
       style={styles.backgroundImage}
     >
       <KeyboardAvoidingView
@@ -303,7 +303,7 @@ function VerifyMpinScreen({ navigation }) {
 
   return (
     <ImageBackground
-      source={require('../../assets/bg.jpg')}
+      source={require('../../assets/bg2.jpg')}
       style={styles.backgroundImage}
     >
       <KeyboardAvoidingView
@@ -319,7 +319,7 @@ function VerifyMpinScreen({ navigation }) {
                   source={require('../../assets/logo2.png')}
                   style={styles.logoImage}
                 />
-                <Text style={styles.logoText}>Jaiguru Jewellers Pvt Ltd</Text>
+                <Text style={styles.logoText}>Jaiguru Jewellers</Text>
               </View>
               <Text style={styles.subtitleText}>(GOLD | SILVER | DIAMOND)</Text>
             </View>

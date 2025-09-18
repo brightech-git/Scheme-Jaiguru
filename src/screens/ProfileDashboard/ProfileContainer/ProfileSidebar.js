@@ -11,18 +11,20 @@ import {
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { LinearGradient } from "expo-linear-gradient";
-import { MaterialIcons, Ionicons, Feather } from "@expo/vector-icons";
+import { MaterialIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { TextDefault } from "../../../components";
-import { colors1 } from "../../../utils/colors";
+import appTheme from "../../../utils/Theme";
+import { StyleSheet } from "react-native";
 
+const { COLORS, SIZES, FONTS } = appTheme;
 const { width } = Dimensions.get("window");
 
 const DrawerMenu = ({ isVisible, onClose }) => {
   const navigation = useNavigation();
   const [userPhone, setUserPhone] = useState("");
   const [userName, setUserName] = useState("");
-  const slideAnim = useState(new Animated.Value(width * 0.8))[0];
+  const slideAnim = useState(new Animated.Value(SIZES.width * 0.75))[0];
 
   useEffect(() => {
     const fetchUserDetails = async () => {
@@ -62,13 +64,13 @@ const DrawerMenu = ({ isVisible, onClose }) => {
       Animated.timing(slideAnim, {
         toValue: 0,
         duration: 300,
-        useNativeDriver: false,
+        useNativeDriver: true,
       }).start();
     } else {
       Animated.timing(slideAnim, {
-        toValue: width * 0.8,
+        toValue: SIZES.width * 0.75,
         duration: 300,
-        useNativeDriver: false,
+        useNativeDriver: true,
       }).start();
     }
   }, [isVisible]);
@@ -106,17 +108,18 @@ const DrawerMenu = ({ isVisible, onClose }) => {
       icon: "description",
       route: "TermsandCondition",
     },
-    { label: 'Delete Account', icon: 'delete', route: 'DeleteButton', iconType: 'MaterialIcons' },
-    // { label: 'My Profile', icon: 'account-circle', route: 'MyProfile', iconType: 'MaterialIcons' },
-    // { label: 'Change MPIN', icon: 'lock', route: 'ChangeMPIN', iconType: 'MaterialIcons' },
-    // { label: 'Set Savings Target', icon: 'track-changes', route: 'SavingsTarget', iconType: 'MaterialIcons' },
-    // { label: 'Notification Settings', icon: 'notifications', route: 'NotificationSettings', iconType: 'MaterialIcons' },
-    // { label: 'Referral Program', icon: 'card-giftcard', route: 'ReferralProgram', iconType: 'MaterialIcons' },
-    // { label: 'History', icon: 'history', route: 'History', iconType: 'MaterialIcons' },
-    // { label: 'Settings', icon: 'settings', route: 'Settings', iconType: 'MaterialIcons' },
-    { label: 'About', icon: 'info', route: 'AboutPage', iconType: 'MaterialIcons' },
-    // { label: 'Support', icon: 'support-agent', route: 'Support', iconType: 'MaterialIcons' },
-    // { label: 'Store Locator', icon: 'location-on', route: 'StoreLocator', iconType: 'MaterialIcons' },
+    {
+      label: "Delete Account",
+      icon: "delete",
+      route: "DeleteButton",
+      iconType: "MaterialIcons",
+    },
+    {
+      label: "About",
+      icon: "info",
+      route: "AboutPage",
+      iconType: "MaterialIcons",
+    },
   ];
 
   const handleMenuItemPress = (route) => {
@@ -125,8 +128,13 @@ const DrawerMenu = ({ isVisible, onClose }) => {
   };
 
   const renderIcon = (item) => {
-    const IconComponent = MaterialIcons;
-    return <IconComponent name={item.icon} size={24} color="#8B0000" />;
+    return (
+      <MaterialIcons
+        name={item.icon}
+        size={SIZES.h3}
+        color={COLORS.primary}
+      />
+    );
   };
 
   return (
@@ -143,17 +151,29 @@ const DrawerMenu = ({ isVisible, onClose }) => {
         >
           <SafeAreaView style={styles.drawerContent}>
             {/* Profile Header */}
-            <View style={styles.profileHeader}>
+            <LinearGradient
+              colors={[COLORS.primary, COLORS.primaryLight]}
+              style={styles.profileHeader}
+            >
               <View style={styles.profileIconContainer}>
                 <View style={styles.profileCircle}>
-                  <MaterialIcons name="account-circle" size={60} color="#333" />
+                  <MaterialIcons
+                    name="account-circle"
+                    size={82}
+                    color={COLORS.title}
+                  />
                 </View>
               </View>
-              <TextDefault style={styles.welcomeText}>
-                Welcome, {userName}
+              {userName && (
+                <TextDefault style={[styles.welcomeText, FONTS.h5]}>
+                  Welcome, {userName}
+                </TextDefault>
+              )}
+
+              <TextDefault style={[styles.phoneText]}>
+                {userPhone}
               </TextDefault>
-              <TextDefault style={styles.phoneText}>{userPhone}</TextDefault>
-            </View>
+            </LinearGradient>
 
             {/* Menu Items */}
             <ScrollView
@@ -168,7 +188,7 @@ const DrawerMenu = ({ isVisible, onClose }) => {
                 >
                   <View style={styles.menuItemContent}>
                     <View style={styles.iconContainer}>{renderIcon(item)}</View>
-                    <TextDefault style={styles.menuItemText}>
+                    <TextDefault style={[styles.menuItemText]}>
                       {item.label}
                     </TextDefault>
                   </View>
@@ -179,9 +199,15 @@ const DrawerMenu = ({ isVisible, onClose }) => {
               <TouchableOpacity style={styles.menuItem} onPress={handleLogout}>
                 <View style={styles.menuItemContent}>
                   <View style={styles.iconContainer}>
-                    <MaterialIcons name="logout" size={24} color="#8B0000" />
+                    <MaterialIcons
+                      name="logout"
+                      size={SIZES.h3}
+                      color={COLORS.danger}
+                    />
                   </View>
-                  <TextDefault style={styles.menuItemText}>Logout</TextDefault>
+                  <TextDefault style={[styles.menuItemText]}>
+                    Logout
+                  </TextDefault>
                 </View>
               </TouchableOpacity>
             </ScrollView>
@@ -192,81 +218,78 @@ const DrawerMenu = ({ isVisible, onClose }) => {
   );
 };
 
-const styles = {
+const styles = StyleSheet.create({
   overlay: {
     flex: 1,
     flexDirection: "row",
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    backgroundColor: COLORS.shadow + "80", // 50% opacity
   },
   overlayTouchable: {
     flex: 1,
   },
   drawer: {
-    width: width * 0.8,
-    backgroundColor: "#FFFFFF",
-    elevation: 16,
-    shadowColor: "#000",
-    shadowOffset: { width: 2, height: 0 },
-    shadowOpacity: 0.25,
-    shadowRadius: 10,
+    width: SIZES.width * 0.75,
+    backgroundColor: COLORS.card,
+    elevation: 6,
+    shadowColor: COLORS.shadow,
+    shadowOffset: { width: -2, height: 0 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
   },
   drawerContent: {
     flex: 1,
   },
   profileHeader: {
-    backgroundColor: "#FFFFFF",
-    paddingVertical: 40,
-    paddingHorizontal: 20,
+    paddingVertical: SIZES.padding,
+    paddingHorizontal: SIZES.padding,
     alignItems: "center",
     borderBottomWidth: 1,
-    borderBottomColor: "#F0F0F0",
+    borderBottomColor: COLORS.borderColor,
   },
   profileIconContainer: {
-    marginBottom: 15,
+    marginBottom: SIZES.margin,
   },
   profileCircle: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: "#F8F8F8",
+    width: SIZES.iconLg * 2,
+    height: SIZES.iconLg * 2,
+    borderRadius: SIZES.iconLg,
+    backgroundColor: COLORS.secondaryLight,
     justifyContent: "center",
     alignItems: "center",
-    borderWidth: 2,
-    borderColor: "#E0E0E0",
+    // borderWidth: 1,
+    borderColor: COLORS.borderColor,
   },
   welcomeText: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "#333",
-    marginBottom: 5,
+    color: COLORS.background,
+    marginBottom: SIZES.margin / 2,
   },
   phoneText: {
-    fontSize: 16,
-    color: "#666",
+    color: COLORS.text,
   },
   menuContainer: {
     flex: 1,
-    paddingTop: 10,
+    paddingTop: SIZES.padding,
   },
   menuItem: {
-    paddingVertical: 15,
-    paddingHorizontal: 20,
+    paddingVertical: SIZES.padding,
+    paddingHorizontal: SIZES.padding,
     borderBottomWidth: 0.5,
-    borderBottomColor: "#F0F0F0",
+    borderBottomColor: COLORS.borderColor,
   },
   menuItemContent: {
     flexDirection: "row",
     alignItems: "center",
   },
   iconContainer: {
-    width: 40,
+    width: SIZES.icon * 3,
     alignItems: "center",
   },
   menuItemText: {
-    fontSize: 16,
-    color: "#333",
-    marginLeft: 15,
+    color: COLORS.text,
+    marginLeft: SIZES.margin,
+    ...FONTS.h5,
+
   },
-};
+});
 
 export default DrawerMenu;

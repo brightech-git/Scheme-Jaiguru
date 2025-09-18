@@ -13,7 +13,7 @@ export const stripeCurrencies = [
   { currency: 'BAM', currency_symbol: 'BAM', multiplier: 100, type: 'STRIPE' },
   { currency: 'BBD', currency_symbol: '$', multiplier: 100, type: 'STRIPE' },
   { currency: 'BDT', currency_symbol: '৳', multiplier: 100, type: 'STRIPE' },
-  { currency: 'BGN', currency_symbol: 'лв', multiplier: 100, type: 'STRIPE' },
+  { currency: 'bg2N', currency_symbol: 'лв', multiplier: 100, type: 'STRIPE' },
   { currency: 'BIF', currency_symbol: 'Fr', multiplier: 1, type: 'STRIPE' },
   { currency: 'BMD', currency_symbol: '$', multiplier: 100, type: 'STRIPE' },
   { currency: 'BND', currency_symbol: '$', multiplier: 100, type: 'STRIPE' },
