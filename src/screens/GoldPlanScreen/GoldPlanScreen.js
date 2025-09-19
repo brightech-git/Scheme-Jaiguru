@@ -112,6 +112,28 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
   },
+<<<<<<< Updated upstream
+=======
+  // Header Styles
+  headerGradient: {
+    paddingTop: SIZES.padding * 2,
+    paddingBottom: SIZES.padding,
+    borderBottomLeftRadius: SIZES.radius_lg,
+    borderBottomRightRadius: SIZES.radius_lg,
+    elevation: 8,
+    shadowColor: COLORS.shadow,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+  },
+  headerContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: SIZES.padding,
+    height: 26,
+  },
+>>>>>>> Stashed changes
   backButton: {
     position: 'absolute',
     top: 10,

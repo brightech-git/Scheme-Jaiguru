@@ -47,7 +47,7 @@ export default StyleSheet.create({
     paddingBottom: SIZES.padding / 2,
   },
   faqIconContainer: {
-    backgroundColor: COLORS.secondary,
+    backgroundColor: COLORS.card,
     borderRadius: SIZES.radius_lg,
     padding: SIZES.padding / 1.5,
     alignItems: 'center',
@@ -59,7 +59,7 @@ export default StyleSheet.create({
     shadowRadius: 3,
   },
   menuIconContainer: {
-    backgroundColor: COLORS.secondary,
+    backgroundColor: COLORS.card,
     borderRadius: SIZES.radius_lg,
     padding: SIZES.padding / 1.5,
     alignItems: 'center',
@@ -93,11 +93,18 @@ export default StyleSheet.create({
   },
   companyName: {
     fontSize: SIZES.h5,
+<<<<<<< Updated upstream
     fontFamily: FONTS.h5.fontFamily,
     lineHeight: FONTS.h5.lineHeight,
     fontWeight: FONTS.heading.fontWeight,
     color: COLORS.title,
+=======
+    fontFamily: 'Poppins-Bold',
+    // fontWeight: '700',
+    color: COLORS.background,
+>>>>>>> Stashed changes
     letterSpacing: 1,
+    ...FONTS.heading
   },
   companySubtitle: {
     fontSize: SIZES.font,
@@ -122,6 +129,7 @@ export default StyleSheet.create({
     textShadowColor: COLORS.dark,
     textShadowOffset: { width: 0.5, height: 0.5 },
     textShadowRadius: 1,
+    ...FONTS.body
   },
   rateCardsContainer: {
     flexDirection: 'row',
@@ -173,26 +181,42 @@ export default StyleSheet.create({
   },
   rateLabel: {
     fontSize: SIZES.fontSm,
+<<<<<<< Updated upstream
     fontFamily: FONTS.fontSm.fontFamily,
     lineHeight: FONTS.fontSm.lineHeight,
+=======
+    // fontFamily: 'TimesNewRoman',
+>>>>>>> Stashed changes
     color: COLORS.textLight,
     fontWeight: FONTS.subheading.fontWeight,
     marginBottom: SIZES.margin / 4,
+    ...FONTS.subheading
   },
   rateValue: {
     fontSize: SIZES.fontLg,
+<<<<<<< Updated upstream
     fontFamily: FONTS.fontLg.fontFamily,
     lineHeight: FONTS.fontLg.lineHeight,
     color: COLORS.success,
     fontWeight: FONTS.heading.fontWeight,
+=======
+    color: COLORS.success,
+    // fontWeight: '700',
+>>>>>>> Stashed changes
     marginBottom: SIZES.margin / 8,
+    ...FONTS.subheading
   },
   rateUnit: {
     fontSize: SIZES.fontXs,
     fontFamily: FONTS.fontXs.fontFamily,
     lineHeight: FONTS.fontXs.lineHeight,
     color: COLORS.textLight,
+<<<<<<< Updated upstream
     fontWeight: FONTS.subheading.fontWeight,
+=======
+    fontWeight: '500',
+    
+>>>>>>> Stashed changes
   },
   sectionHeaderContainer: {
     flexDirection: 'row',

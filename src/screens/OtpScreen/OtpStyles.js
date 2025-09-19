@@ -1,7 +1,11 @@
 import { StyleSheet } from "react-native";
 import appTheme from "../../utils/Theme";
 
+<<<<<<< Updated upstream
 const { COLORS, SIZES, FONTS } = appTheme;
+=======
+const { COLORS, FONTS, SIZES } = appTheme;
+>>>>>>> Stashed changes
 
 export default StyleSheet.create({
   backgroundImage: {
@@ -20,15 +24,25 @@ export default StyleSheet.create({
   container: {
     justifyContent: "center",
     alignItems: "center",
+<<<<<<< Updated upstream
     padding: SIZES.padding,
+=======
+    padding: 20,
+    marginBottom: 70,
+>>>>>>> Stashed changes
   },
   logoContainer: {
     marginBottom: SIZES.margin * 2,
     alignItems: "center",
   },
   logoImage: {
+<<<<<<< Updated upstream
     width: 200,
     height: 200,
+=======
+    width: 170,
+    height: 170,
+>>>>>>> Stashed changes
     resizeMode: "contain",
   },
   card: {
@@ -46,16 +60,72 @@ export default StyleSheet.create({
 
   // Typography
   title: {
+<<<<<<< Updated upstream
     ...FONTS.h1,
     textAlign: "center",
-    marginBottom: 8,
+=======
+    // fontSize: 24,
+    // fontWeight: "bold",
+    color: COLORS.text,
+    textAlign: "center",
+    marginBottom: 10,
+    ...FONTS.h2,
   },
+  subtitle: {
+    fontSize: 26,
+    color: COLORS.textLight,
+    textAlign: "center",
+    marginBottom: 20,
+    ...FONTS.body
+  },
+  label: {
+    fontSize: 16,
+    color: COLORS.title,
+>>>>>>> Stashed changes
+    marginBottom: 8,
+    ...FONTS.heading
+  },
+<<<<<<< Updated upstream
   subtitle: {
     ...FONTS.body,
     color: COLORS.textLight,
     textAlign: "center",
     marginBottom: SIZES.margin * 2,
      fontSize: SIZES.h1,
+=======
+  autoDetectContainer: {
+  marginBottom: 10,
+  padding: 10,
+  backgroundColor: COLORS.primary + '20',
+  borderRadius: 8,
+  alignItems: 'center',
+},
+autoDetectText: {
+  color: COLORS.primary,
+  fontSize: 12,
+},
+pasteButton: {
+  marginBottom: 15,
+  padding: 10,
+  backgroundColor: COLORS.secondary + '20',
+  borderRadius: 8,
+  alignItems: 'center',
+},
+pasteText: {
+  color: COLORS.secondary,
+  fontSize: 14,
+  fontWeight: 'bold',
+},
+  input: {
+    backgroundColor: COLORS.background,
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 16,
+    color: COLORS.text,
+    marginBottom: 12,
+    ...FONTS.subheading,
+   
+>>>>>>> Stashed changes
   },
   label: {
     ...FONTS.subheading,
@@ -170,4 +240,34 @@ export default StyleSheet.create({
     fontSize: SIZES.font,
     color: COLORS.primary,
   },
+<<<<<<< Updated upstream
 });
+=======
+  resendDisabled: {
+    color: COLORS.textLight,
+  },
+  linkText: {
+    color: COLORS.title,
+    fontSize: 16,
+    textAlign: "center",
+    marginTop: 12,
+    ...FONTS.subheading
+  },
+  loadingOverlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(0,0,0,0.8)",
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 999,
+  },
+  loadingText: {
+    marginTop: 12,
+    color: COLORS.white,
+    fontSize: 16,
+  },
+});
+>>>>>>> Stashed changes

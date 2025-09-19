@@ -19,6 +19,7 @@ function KnowMore() {
   );
 
   return (
+<<<<<<< Updated upstream
     <ImageBackground
       source={require("../../assets/bg.jpg")}
       style={styles.backgroundImage}
@@ -26,6 +27,16 @@ function KnowMore() {
     >
       <ScrollView contentContainerStyle={styles.container}>
         <Text style={styles.title}>DIGIGOLD SCHEME</Text>
+=======
+    <View style={styles.container}>
+      <ImageBackground
+        source={require("../../assets/bg.jpg")}
+        style={styles.backgroundImage}
+        resizeMode="cover"
+      >
+        {/* Custom Header */}
+        <CustomHeader />
+>>>>>>> Stashed changes
 
         <Text style={styles.description}>
           Choose DigiGold because it offers a convenient and flexible way to save in gold through a mobile app, providing tiered benefits that allow users to earn additional gold weight on their savings. DigiGold is an ideal choice for customers seeking a secure and accessible investment in gold, with the option to redeem their savings for attractive gold jewellery at Jaiguru Jewellers.

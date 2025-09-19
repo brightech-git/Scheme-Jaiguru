@@ -47,7 +47,7 @@ export default function EnhancedSlider() {
   useEffect(() => {
     const fetchBanners = async () => {
       try {
-        const response = await fetch('https://app.bmgjewellers.com/api/v1/App_banner/list');
+        const response = await fetch('https://akj.brightechsoftware.com/api/v1/slideshow/list');
         const data = await response.json();
         
         // Map API data to use your desired fallback URLs
@@ -121,8 +121,13 @@ export default function EnhancedSlider() {
   };
 
   const renderSliderItem = ({ item }) => {
+<<<<<<< Updated upstream
     const imageUrl = `https://app.bmgjewellers.com${item.image_path}`;
     
+=======
+    const imageUrl = `https://akj.brightechsoftware.com${item.image_path}`;
+
+>>>>>>> Stashed changes
     return (
       <TouchableOpacity
         style={styles.sliderItem}

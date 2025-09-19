@@ -140,6 +140,13 @@ const PaymentHistory = ({ navigation, route }) => {
   }, [formatDateTime]);
 
   return (
+<<<<<<< Updated upstream
+=======
+    <ImageBackground
+      source={require('../../assets/bg.jpg')}
+      style={styles.background}
+    >
+>>>>>>> Stashed changes
     <SafeAreaView style={styles.container}>
       <LinearGradient
         colors={[colors1.primary, colors1.primaryDark]}
@@ -221,7 +228,46 @@ const PaymentHistory = ({ navigation, route }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+<<<<<<< Updated upstream
     backgroundColor: colors1.background,
+=======
+    // backgroundColor: COLORS.background,
+  },
+  background: {
+    flex: 1,
+    resizeMode: 'cover',
+    justifyContent: 'center',
+  },
+  customHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: SIZES.padding,
+    paddingVertical: 12,
+    backgroundColor: COLORS.card,
+  },
+  backButton: {
+    padding: 4,
+    backgroundColor: COLORS.card,
+    borderRadius: 10,
+    // elevation: 2,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
+  },
+  headerTitle: {
+    ...FONTS.h4,
+    color: COLORS.title,
+    textAlign: 'center',
+    flex: 1,
+  },
+  sortButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: COLORS.primaryLight,
+    justifyContent: 'center',
+    alignItems: 'center',
+>>>>>>> Stashed changes
   },
   headerGradient: {
     paddingBottom: scale(20),

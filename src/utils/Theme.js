@@ -2,6 +2,7 @@ import { Dimensions } from "react-native";
 const { width, height } = Dimensions.get("screen");
 
 export const COLORS = {
+<<<<<<< Updated upstream
   primary: "#C5A572", // Elegant muted gold
   primaryLight: "rgba(197, 165, 114, 0.25)",
   secondary: "#8C6C3F", // Rich bronze
@@ -45,6 +46,62 @@ export const COLORS = {
   outline: "#D6C7B5",
   shadow: "rgba(0, 0, 0, 0.12)",
   overlay: "rgba(0, 0, 0, 0.5)",
+=======
+  // Base
+  background: "#FFFFFF",   // main app background (white)
+  card: "#F9F9F9",         // card containers (light grey)
+  surface: "#FAFAFA",      // elevated surfaces
+  surfaceVariant: "#F0F0F0",
+
+  // Core Brand
+  primary: "#134680ff",      // luxury gold (buttons, highlights)
+  primaryLight: "rgba(212, 175, 55, 0.2)", // subtle gold tint
+  secondary: "#8C6C3F",    // bronze accent
+  notification: "#FFD700", // bright gold for alerts
+
+  // Status
+  success: "#4CAF50",      // emerald green (positive)
+  danger: "#E53935",       // ruby red (negative)
+  warning: "#FFC107",      // amber yellow
+  info: "#1565C0",         // deep sapphire blue
+
+  // Text
+  title: "#1A1A1A",        // black for titles
+  text: "#2E2E2E",         // main text (dark grey)
+  textLight: "#555555",    // secondary text (muted dark grey)
+  label: "#757575",        // inputs, captions
+  placeholder: "rgba(0, 0, 0, 0.5)",
+  white: "#FFFFFF",
+
+  // Borders & Shadows
+  borderColor: "rgba(0, 0, 0, 0.1)",
+  outline: "#DDDDDD",
+  shadow: "rgba(0, 0, 0, 0.1)",
+  overlay: "rgba(0, 0, 0, 0.2)",
+
+  // Inputs
+  input: "#FFFFFF",        // white input field
+  darkInput: "#F5F5F5",    // light grey input bg
+
+  // Icons
+  iconPrimary: '#D4AF37',
+  iconSecondary: '#757575',
+
+  // Gradients
+  gradientPrimary: ['#fff', '#f1efc5ff'], // gold → bronze
+  gradientSecondary: ['rgba(2, 2, 1, 0.15)', '#D4AF37'],
+  gradientText: ['#1565C0', '#E53935'], // sapphire → ruby
+  gradientBackground: "linear-gradient(135deg, #FFFFFF, #F9F9F9)", // Web CSS
+
+  // Productcard
+  gradientcolor1: "#8C6C3F",   // very light gold tint
+  gradientcolor2: "rgba(212, 175, 55, 0.61)",   // bronze tint
+  gradientPrimary1: ['#8C6C3F', 'rgba(212, 175, 55, 0.61)'],
+
+  // Goldplan
+  gradientcolor3: "#D4AF37",   // classic gold
+  gradientcolor4: "#4CAF50",   // emerald green
+>>>>>>> Stashed changes
 };
 
 export const SIZES = {
@@ -145,7 +202,7 @@ export const FONTS = {
   // Custom semantic roles
   heading: {
     fontFamily: "TrajanProBold",
-    fontWeight: "700",
+    
   },
   subheading: {
     fontFamily: "DMSerif",
@@ -156,6 +213,7 @@ export const FONTS = {
     fontWeight: "600",
   },
 };
+
 export const ICONS = {
 	user: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M20 21V19C20 17.9391 19.5786 16.9217 18.8284 16.1716C18.0783 15.4214 17.0609 15 16 15H8C6.93913 15 5.92172 15.4214 5.17157 16.1716C4.42143 16.9217 4 17.9391 4 19V21" stroke="#757575" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 11C14.2091 11 16 9.20914 16 7C16 4.79086 14.2091 3 12 3C9.79086 3 8 4.79086 8 7C8 9.20914 9.79086 11 12 11Z" stroke="#757575" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
 	lock: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M5 12C4.44772 12 4 12.4477 4 13V20C4 20.5523 4.44772 21 5 21H19C19.5523 21 20 20.5523 20 20V13C20 12.4477 19.5523 12 19 12H5ZM2 13C2 11.3431 3.34315 10 5 10H19C20.6569 10 22 11.3431 22 13V20C22 21.6569 20.6569 23 19 23H5C3.34315 23 2 21.6569 2 20V13Z" fill="#757575"/><path fill-rule="evenodd" clip-rule="evenodd" d="M12 3C10.9391 3 9.92172 3.42143 9.17157 4.17157C8.42143 4.92172 8 5.93913 8 7V11C8 11.5523 7.55228 12 7 12C6.44772 12 6 11.5523 6 11V7C6 5.4087 6.63214 3.88258 7.75736 2.75736C8.88258 1.63214 10.4087 1 12 1C13.5913 1 15.1174 1.63214 16.2426 2.75736C17.3679 3.88258 18 5.4087 18 7V11C18 11.5523 17.5523 12 17 12C16.4477 12 16 11.5523 16 11V7C16 5.93913 15.5786 4.92172 14.8284 4.17157C14.0783 3.42143 13.0609 3 12 3Z" fill="#757575"/></svg>`,

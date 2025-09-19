@@ -131,7 +131,44 @@ Maturity Date: ${formatDate(productData?.maturityDate)}`;
   );
 
   return (
+<<<<<<< Updated upstream
     <SafeAreaView style={styles.container}>
+=======
+    <ImageBackground
+      source={require('../../assets/bg.jpg')}
+      style={styles.backgroundImage}
+    >
+      <SafeAreaView style={styles.container} edges={['top']}>
+        {/* Custom Header */}
+        <View style={styles.customHeader}>
+          <TouchableOpacity
+            style={styles.backButton}
+          onPress={handleBack}
+          accessible={true}
+          accessibilityRole="button"
+          accessibilityLabel="Go back"
+          testID="back-button"
+          activeOpacity={0.7}
+        >
+          <MaterialIcons name="arrow-back" size={24} color={COLORS.primary} />
+        </TouchableOpacity>
+        
+        <Text style={styles.headerTitle}>Gold Passbook</Text>
+        
+        {/* <TouchableOpacity
+          style={styles.shareButton}
+          onPress={handleShare}
+          accessible={true}
+          accessibilityRole="button"
+          accessibilityLabel="Share passbook details"
+          testID="share-button"
+          activeOpacity={0.7}
+        >
+          <Icon name="share-alt" size={20} color={COLORS.primary} />
+        </TouchableOpacity> */}
+      </View>
+
+>>>>>>> Stashed changes
       <ScrollView
         showsVerticalScrollIndicator={false}
         refreshControl={
@@ -309,7 +346,26 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255, 255, 255, 0.3)',
   },
   schemeName: {
+<<<<<<< Updated upstream
     fontSize: scale(18),
+=======
+    ...FONTS.h4,
+    color: COLORS.title,
+    marginBottom: 4,
+  },
+  schemeName1: {
+    ...FONTS.h4,
+    color: COLORS.gradientcolor4,
+    marginBottom: 4,
+  },
+  schemeStatus: {
+    ...FONTS.subheading,
+    color: COLORS.title,
+    marginBottom: SIZES.margin,
+    fontSize: SIZES.h6
+  },
+  statusActive: {
+>>>>>>> Stashed changes
     fontWeight: '600',
     color: colors.white,
     marginBottom: scale(12),
@@ -319,10 +375,17 @@ const styles = StyleSheet.create({
     marginBottom: scale(12),
   },
   progressBarBackground: {
+<<<<<<< Updated upstream
     height: scale(6),
     backgroundColor: 'rgba(255, 255, 255, 0.3)',
     borderRadius: scale(3),
     marginBottom: scale(8),
+=======
+    height: 8,
+    backgroundColor: 'rgba(211, 5, 5, 0.1)',
+    borderRadius: 4,
+    overflow: 'hidden',
+>>>>>>> Stashed changes
   },
   progressBarFill: {
     height: '100%',
@@ -341,6 +404,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   statItem: {
+<<<<<<< Updated upstream
+=======
+    backgroundColor: COLORS.outline,
+    borderRadius: SIZES.radius,
+    padding: SIZES.padding,
+>>>>>>> Stashed changes
     alignItems: 'center',
   },
   statValue: {
@@ -369,11 +438,18 @@ const styles = StyleSheet.create({
     marginBottom: scale(25),
   },
   infoCard: {
+<<<<<<< Updated upstream
     backgroundColor: colors.white,
     flex: 1,
     marginHorizontal: scale(5),
     padding: scale(15),
     borderRadius: scale(15),
+=======
+    backgroundColor: COLORS.outline,
+    borderRadius: SIZES.radius,
+    padding: SIZES.padding,
+    width: (width - SIZES.margin * 2 - 12) / 3,
+>>>>>>> Stashed changes
     alignItems: 'center',
     elevation: 4,
     shadowColor: colors1.primaryDark,
@@ -394,6 +470,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   historySection: {
+<<<<<<< Updated upstream
     backgroundColor: colors.white,
     borderRadius: scale(20),
     padding: scale(20),
@@ -402,6 +479,17 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.08,
     shadowRadius: 4,
+=======
+    backgroundColor: COLORS.outline,
+    marginHorizontal: SIZES.margin,
+    borderRadius: SIZES.radius_lg,
+    padding: SIZES.padding,
+    elevation: 2,
+    shadowColor: COLORS.shadow,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+>>>>>>> Stashed changes
   },
   historyHeader: {
     flexDirection: 'row',

@@ -195,6 +195,7 @@ function ProductCard({
 }
 
 const styles = StyleSheet.create({
+<<<<<<< Updated upstream
   cardContainer: {
     margin: scale(5),
     borderRadius: scale(15),
@@ -205,6 +206,20 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 3.84
   },
+=======
+ cardContainer: {
+  paddingTop: scale(7),
+  borderRadius: SIZES.radius_lg,
+  overflow: 'hidden',
+  // elevation: 6,
+  // shadowColor: COLORS.dark,
+  // shadowOffset: { width: 0, height: 2 },
+  // shadowOpacity: 0.25,
+  // shadowRadius: 4,
+  // ❌ remove width: '100%'
+},
+
+>>>>>>> Stashed changes
   gradientBackground: {
     borderRadius: scale(15),
     padding: scale(5)

@@ -19,7 +19,11 @@ function GoldPlan(props) {
     <TouchableOpacity style={[styles.cardContainer, props.styles]}>
       {/* 🔥 Gradient Background */}
       <LinearGradient
+<<<<<<< Updated upstream
         colors={[colors1.gradientcolor3, colors1.gradientcolor4]}
+=======
+        colors={COLORS.gradientPrimary1}
+>>>>>>> Stashed changes
         start={{ x: 0, y: 0 }}
         end={{ x: 0, y: 1 }}
         style={styles.gradientBackground}
@@ -96,10 +100,22 @@ const styles = StyleSheet.create({
     paddingHorizontal: scale(10),
     borderRadius: scale(5),
   },
+<<<<<<< Updated upstream
   text: {
     color: colors.greenColor,
     fontSize: scale(12),
     fontWeight: 'bold',
+=======
+  joinButton: {
+    backgroundColor: COLORS.primaryLight,
+    paddingVertical: SIZES.padding / 2,
+    paddingHorizontal: SIZES.padding,
+    borderRadius: SIZES.radius_sm,
+    borderWidth: 1,
+    borderColor: COLORS.primary,
+    flex: 1,
+    marginRight: SIZES.margin / 2,
+>>>>>>> Stashed changes
   },
   payButtonText: {
     color: colors.black,
@@ -107,6 +123,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
   },
+<<<<<<< Updated upstream
   description: {
     color: colors.greenColor,
     fontSize: 14,
@@ -117,6 +134,13 @@ const styles = StyleSheet.create({
     color: colors.greenColor,
     fontSize: 14,
     marginTop: 5,
+=======
+  joinButtonText: {
+    ...FONTS.h5,
+    color: COLORS.title,
+    fontWeight: '600',
+    textAlign: 'center',
+>>>>>>> Stashed changes
   },
 });
 
