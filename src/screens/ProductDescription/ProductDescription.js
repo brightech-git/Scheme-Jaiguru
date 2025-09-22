@@ -299,7 +299,7 @@ Shared via Gold Scheme App`;
 
   return (
     <ImageBackground
-      source={require('../../assets/bg2.jpg')}
+      source={require('../../assets/bg.jpg')}
       style={styles.backgroundImage}
     >
       <SafeAreaView style={styles.container} edges={['top']}>
@@ -350,7 +350,7 @@ Shared via Gold Scheme App`;
         {/* Scheme Card */}
         <View style={styles.schemeCard}>
           <LinearGradient
-            colors={COLORS.gradientPrimary}
+            colors={COLORS.gradientPrimary2}
             style={styles.schemeCardGradient}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
@@ -544,23 +544,23 @@ const styles = StyleSheet.create({
   },
   schemeName: {
     ...FONTS.h4,
-    color: COLORS.title,
+    color: COLORS.white,
     marginBottom: 4,
   },
   schemeName1: {
     ...FONTS.h4,
-    color: COLORS.gradientcolor4,
+    color: COLORS.white,
     marginBottom: 4,
   },
   schemeStatus: {
     ...FONTS.subheading,
-    color: COLORS.background,
+    color: COLORS.outline,
     marginBottom: SIZES.margin,
     fontSize: SIZES.h6
   },
   statusActive: {
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.warning,
   },
   progressContainer: {
     marginTop: 8,
@@ -572,13 +572,13 @@ const styles = StyleSheet.create({
   },
   progressLabel: {
     ...FONTS.h6,
-    color: COLORS.placeholder,
+    color: COLORS.white,
     fontWeight: '500',
     
   },
   progressPercentage: {
     ...FONTS.h6,
-    color: COLORS.title,
+    color: COLORS.outline,
     fontWeight: '600',
   },
   progressBarBackground: {

@@ -1,323 +1,86 @@
-import React, { useState } from "react";
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  ScrollView,
-  Image,
-  ImageBackground,
-} from "react-native";
-import { LinearGradient } from "expo-linear-gradient";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { showToast } from "../../utils/toast";
-import appTheme from "../../utils/Theme";
-import styles from "./ServiceStyles";
 
-const { COLORS } = appTheme;
+const API_BASE_URL = "https://akj.brightechsoftware.com/api/v1";
 
-function ServicePage({ navigation, onNavigateToOtp, onNavigateToLogin, onNavigateToRegister, onNavigateToForgotPassword, onNavigateToProfile }) {
-  const [activeTab, setActiveTab] = useState("login");
-  const [loginData, setLoginData] = useState({ username: "", password: "" });
-  const [registerData, setRegisterData] = useState({
-    username: "",
-    email: "",
-    contactNumber: "",
-    password: "",
-    confirmPassword: ""
-  });
-  const [forgotPasswordData, setForgotPasswordData] = useState({ 
-    contactNumber: "", 
-    email: "" 
-  });
+// Get auth headers dynamically
+const getAuthHeader = async () => {
+  const token = await AsyncStorage.getItem("authToken");
+  return token ? { Authorization: `Bearer ${token}` } : {};
+};
 
-  const handleLogin = async () => {
-    try {
-      const response = await fetch("https://your-api-base-url/api/v1/user/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(loginData),
-      });
+// Unified fetch wrapper (returns { success, data, error })
+const request = async (url, options = {}) => {
+  const authHeader = await getAuthHeader();
+  const headers = { "Content-Type": "application/json", ...authHeader, ...options.headers };
 
-      if (response.ok) {
-        const data = await response.json();
-        await AsyncStorage.setItem("authToken", data.token);
-        showToast("Login successful!");
-        onNavigateToProfile();
-      } else {
-        showToast("Invalid credentials");
-      }
-    } catch (error) {
-      showToast("Login failed. Please try again.");
-    }
-  };
+  try {
+    const response = await fetch(url, { ...options, headers });
+    const data = await response.json().catch(() => null);
 
-  const handleRegister = async () => {
-    if (registerData.password !== registerData.confirmPassword) {
-      showToast("Passwords don't match");
-      return;
+    // Check for specific error messages
+    if (data?.message?.toLowerCase().includes("already exists") || data?.message?.toLowerCase().includes("invalid")) {
+      return { success: false, error: data.message };
     }
 
-    try {
-      const response = await fetch("https://your-api-base-url/api/v1/user/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(registerData),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        if (data.message) {
-          showToast(data.message);
-        } else {
-          showToast("Registration successful! Please verify OTP.");
-          await AsyncStorage.setItem("userContactNumber", registerData.contactNumber);
-          onNavigateToOtp(registerData.contactNumber);
-        }
-      }
-    } catch (error) {
-      showToast("Registration failed. Please try again.");
+    if (!response.ok) {
+      return { success: false, error: data?.message || data?.error || "Something went wrong", status: response.status, details: data };
     }
-  };
 
-  const handleForgotPassword = async () => {
-    try {
-      const response = await fetch("https://your-api-base-url/api/v1/user/forgot-password", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(forgotPasswordData),
-      });
+    return { success: true, data };
+  } catch (err) {
+    return { success: false, error: err.message || "Network error" };
+  }
+};
 
-      if (response.ok) {
-        showToast("Password reset instructions sent!");
-      } else {
-        showToast("Failed to process request");
-      }
-    } catch (error) {
-      showToast("Request failed. Please try again.");
+const userService = {
+  registerUser: async (userData) => {
+    return request(`${API_BASE_URL}/user/register`, {
+      method: "POST",
+      body: JSON.stringify(userData),
+    });
+  },
+
+  verifyOtp: async (contactNumber, otp) => {
+    const params = new URLSearchParams({ contactNumber, otp });
+    return request(`${API_BASE_URL}/user/verify-otp?${params.toString()}`, { method: "POST" });
+  },
+
+  loginUser: async (credentials) => {
+    const res = await request(`${API_BASE_URL}/user/login`, {
+      method: "POST",
+      body: JSON.stringify(credentials),
+    });
+
+    if (res.success && res.data?.token) {
+      await AsyncStorage.setItem("authToken", res.data.token);
     }
-  };
 
-  const renderLoginForm = () => (
-    <View style={styles.formContainer}>
-      <Text style={styles.label}>Username</Text>
-      <TextInput
-        style={styles.input}
-        value={loginData.username}
-        onChangeText={(text) => setLoginData({...loginData, username: text})}
-        placeholder="Enter your username"
-        placeholderTextColor={COLORS.textLight}
-      />
-      
-      <Text style={styles.label}>Password</Text>
-      <TextInput
-        style={styles.input}
-        value={loginData.password}
-        onChangeText={(text) => setLoginData({...loginData, password: text})}
-        placeholder="Enter your password"
-        placeholderTextColor={COLORS.textLight}
-        secureTextEntry
-      />
-      
-      <TouchableOpacity 
-        style={styles.linkButton}
-        onPress={onNavigateToForgotPassword}
-      >
-        <Text style={styles.linkText}>Forgot Password?</Text>
-      </TouchableOpacity>
-      
-      <TouchableOpacity
-        style={styles.primaryButton}
-        onPress={handleLogin}
-      >
-        <LinearGradient
-          colors={[COLORS.primary, COLORS.secondary]}
-          style={styles.buttonGradient}
-        >
-          <Text style={styles.primaryButtonText}>Login</Text>
-        </LinearGradient>
-      </TouchableOpacity>
-      
-      <TouchableOpacity 
-        style={styles.switchFormButton}
-        onPress={() => setActiveTab("register")}
-      >
-        <Text style={styles.switchFormText}>
-          Don't have an account? <Text style={styles.switchFormLink}>Register</Text>
-        </Text>
-      </TouchableOpacity>
-    </View>
-  );
+    return res;
+  },
 
-  const renderRegisterForm = () => (
-    <View style={styles.formContainer}>
-      <Text style={styles.label}>Username</Text>
-      <TextInput
-        style={styles.input}
-        value={registerData.username}
-        onChangeText={(text) => setRegisterData({...registerData, username: text})}
-        placeholder="Choose a username"
-        placeholderTextColor={COLORS.textLight}
-      />
-      
-      <Text style={styles.label}>Email</Text>
-      <TextInput
-        style={styles.input}
-        value={registerData.email}
-        onChangeText={(text) => setRegisterData({...registerData, email: text})}
-        placeholder="Enter your email"
-        placeholderTextColor={COLORS.textLight}
-        keyboardType="email-address"
-      />
-      
-      <Text style={styles.label}>Mobile Number</Text>
-      <TextInput
-        style={styles.input}
-        value={registerData.contactNumber}
-        onChangeText={(text) => setRegisterData({...registerData, contactNumber: text})}
-        placeholder="Enter 10-digit number"
-        placeholderTextColor={COLORS.textLight}
-        keyboardType="phone-pad"
-        maxLength={10}
-      />
-      
-      <Text style={styles.label}>Password</Text>
-      <TextInput
-        style={styles.input}
-        value={registerData.password}
-        onChangeText={(text) => setRegisterData({...registerData, password: text})}
-        placeholder="Create a password"
-        placeholderTextColor={COLORS.textLight}
-        secureTextEntry
-      />
-      
-      <Text style={styles.label}>Confirm Password</Text>
-      <TextInput
-        style={styles.input}
-        value={registerData.confirmPassword}
-        onChangeText={(text) => setRegisterData({...registerData, confirmPassword: text})}
-        placeholder="Confirm your password"
-        placeholderTextColor={COLORS.textLight}
-        secureTextEntry
-      />
-      
-      <TouchableOpacity
-        style={styles.primaryButton}
-        onPress={handleRegister}
-      >
-        <LinearGradient
-          colors={[COLORS.primary, COLORS.secondary]}
-          style={styles.buttonGradient}
-        >
-          <Text style={styles.primaryButtonText}>Register</Text>
-        </LinearGradient>
-      </TouchableOpacity>
-      
-      <TouchableOpacity 
-        style={styles.switchFormButton}
-        onPress={() => setActiveTab("login")}
-      >
-        <Text style={styles.switchFormText}>
-          Already have an account? <Text style={styles.switchFormLink}>Login</Text>
-        </Text>
-      </TouchableOpacity>
-    </View>
-  );
+  getUserById: async (id) => {
+    const headers = await getAuthHeader();
+    return request(`${API_BASE_URL}/user/getUserMasterDataById/${id}`, { headers });
+  },
 
-  const renderForgotPasswordForm = () => (
-    <View style={styles.formContainer}>
-      <Text style={styles.label}>Mobile Number or Email</Text>
-      <TextInput
-        style={styles.input}
-        value={forgotPasswordData.contactNumber || forgotPasswordData.email}
-        onChangeText={(text) => {
-          if (text.includes("@")) {
-            setForgotPasswordData({email: text, contactNumber: ""});
-          } else {
-            setForgotPasswordData({contactNumber: text, email: ""});
-          }
-        }}
-        placeholder="Enter your mobile number or email"
-        placeholderTextColor={COLORS.textLight}
-      />
-      
-      <TouchableOpacity
-        style={styles.primaryButton}
-        onPress={handleForgotPassword}
-      >
-        <LinearGradient
-          colors={[COLORS.primary, COLORS.secondary]}
-          style={styles.buttonGradient}
-        >
-          <Text style={styles.primaryButtonText}>Reset Password</Text>
-        </LinearGradient>
-      </TouchableOpacity>
-      
-      <TouchableOpacity 
-        style={styles.switchFormButton}
-        onPress={() => setActiveTab("login")}
-      >
-        <Text style={styles.switchFormText}>
-          Back to <Text style={styles.switchFormLink}>Login</Text>
-        </Text>
-      </TouchableOpacity>
-    </View>
-  );
+  getProfile: async () => {
+    const headers = await getAuthHeader();
+    return request(`${API_BASE_URL}/user/profile`, { headers });
+  },
 
-  return (
-    <ImageBackground
-      source={require("../../assets/bg.jpg")}
-      style={styles.backgroundImage}
-    >
-      <View style={styles.container}>
-        <View style={styles.logoContainer}>
-          <Image
-            source={require("../../assets/logo2.png")}
-            style={styles.logoImage}
-          />
-        </View>
+  forgotPassword: async (data) => {
+    return request(`${API_BASE_URL}/user/forgot-password`, {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+  },
 
-        <View style={styles.card}>
-          <View style={styles.tabContainer}>
-            <TouchableOpacity 
-              style={[styles.tab, activeTab === "login" && styles.activeTab]}
-              onPress={() => setActiveTab("login")}
-            >
-              <Text style={[styles.tabText, activeTab === "login" && styles.activeTabText]}>
-                Login
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity 
-              style={[styles.tab, activeTab === "register" && styles.activeTab]}
-              onPress={() => setActiveTab("register")}
-            >
-              <Text style={[styles.tabText, activeTab === "register" && styles.activeTabText]}>
-                Register
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity 
-              style={[styles.tab, activeTab === "forgot" && styles.activeTab]}
-              onPress={() => setActiveTab("forgot")}
-            >
-              <Text style={[styles.tabText, activeTab === "forgot" && styles.activeTabText]}>
-                Forgot Password
-              </Text>
-            </TouchableOpacity>
-          </View>
+  resetPassword: async (data) => {
+    return request(`${API_BASE_URL}/user/reset-password`, {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+  },
+};
 
-          {activeTab === "login" && renderLoginForm()}
-          {activeTab === "register" && renderRegisterForm()}
-          {activeTab === "forgot" && renderForgotPasswordForm()}
-        </View>
-      </View>
-    </ImageBackground>
-  );
-}
-
-export default ServicePage;
+export default userService;

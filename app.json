@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "Jaiguru-DigiGold",
-    "slug": "jaiguruscheme-2",
+    "slug": "jaiguru-scheme",
     "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -29,10 +29,10 @@
     },
     "extra": {
       "eas": {
-        "projectId": "85e88055-33db-46da-8dc0-5ea198798ca5"
+        "projectId": "03d0e797-5bdc-436e-888f-035e574e612e"
       }
     },
-    "owner": "brightechsoftware",
+    "owner": "kiruba08",
     "plugins": [
       "expo-font",
       "expo-asset"

@@ -45,7 +45,7 @@ export default function EnhancedSlider() {
   useEffect(() => {
     const fetchBanners = async () => {
       try {
-        const response = await fetch('https://app.bmgjewellers.com/api/v1/App_banner/list');
+        const response = await fetch('https://akj.brightechsoftware.com/api/v1/slideshow/list');
         const data = await response.json();
 
         const bannersWithUrls = data.map((banner, index) => {
@@ -110,7 +110,7 @@ export default function EnhancedSlider() {
   };
 
   const renderSliderItem = ({ item }) => {
-    const imageUrl = `https://app.bmgjewellers.com${item.image_path}`;
+    const imageUrl = `https://akj.brightechsoftware.com${item.image_path}`;
 
     return (
       <TouchableOpacity

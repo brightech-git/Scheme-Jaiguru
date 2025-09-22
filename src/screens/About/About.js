@@ -65,7 +65,7 @@ const AboutPage = () => {
       >
         <View style={styles.logoSection}>
           <LinearGradient
-            colors={[COLORS.gold, COLORS.goldLight]}
+            colors={[COLORS.gradientcolor2, COLORS.gradientcolor1]}
             style={styles.logoGradient}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
@@ -77,7 +77,7 @@ const AboutPage = () => {
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <MaterialIcons name="book" size={SIZES.h4} color={COLORS.primary} />
-            <Text style={styles.sectionTitle}>Our Story</Text>
+            <Text style={styles.sectionTitle}>Our story</Text>
           </View>
           <Text style={styles.sectionContent}>
             Jaiguru Jewellers began as a small, family-run business with a simple goal: to offer high-quality, genuine jewellery to the people of Madurai. What started as a humble endeavour has now grown into a trusted name, recognized for our dedication to craftsmanship, value, and customer care.
@@ -104,7 +104,7 @@ const AboutPage = () => {
           
           <View style={styles.certificationBox}>
             <LinearGradient
-              colors={[COLORS.successLight, COLORS.successLighter]}
+              colors={[COLORS.outline, COLORS.outline]}
               style={styles.certificationGradient}
             >
               <MaterialIcons name="verified" size={SIZES.h3} color={COLORS.success} />
@@ -124,7 +124,7 @@ const AboutPage = () => {
           {features.map((feature, index) => (
             <View key={index} style={styles.featureCard}>
               <LinearGradient
-                colors={[`${feature.color}33`, `${feature.color}1A`]}
+                 colors={[COLORS.outline, COLORS.outline]}
                 style={styles.featureGradient}
               >
                 <View style={[styles.featureIcon, { backgroundColor: `${feature.color}4D` }]}>
@@ -166,7 +166,7 @@ const AboutPage = () => {
           </View>
           <View style={styles.visionBox}>
             <LinearGradient
-              colors={[COLORS.light, COLORS.white]}
+              colors={[COLORS.primary, COLORS.secondary]}
               style={styles.visionGradient}
             >
               <MaterialIcons name="trending-up" size={SIZES.h3} color={COLORS.accent} />
@@ -187,7 +187,7 @@ const AboutPage = () => {
           </View>
           <View style={styles.promiseBox}>
             <LinearGradient
-              colors={[COLORS.primaryLight, COLORS.light]}
+               colors={[COLORS.outline, COLORS.outline]}
               style={styles.promiseGradient}
             >
               <MaterialIcons name="handshake" size={SIZES.h3} color={COLORS.accent} />

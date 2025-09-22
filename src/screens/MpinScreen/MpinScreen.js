@@ -135,7 +135,7 @@ function MpinScreen({ route, navigation }) {
 
   return (
     <ImageBackground
-      source={require('../../assets/bg2.jpg')}
+      source={require('../../assets/bg.jpg')}
       style={styles.backgroundImage}
     >
       <KeyboardAvoidingView
@@ -303,7 +303,7 @@ function VerifyMpinScreen({ navigation }) {
 
   return (
     <ImageBackground
-      source={require('../../assets/bg2.jpg')}
+      source={require('../../assets/bg.jpg')}
       style={styles.backgroundImage}
     >
       <KeyboardAvoidingView

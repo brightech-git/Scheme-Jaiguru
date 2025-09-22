@@ -8,15 +8,20 @@ import {
   ImageBackground,
   ActivityIndicator,
   ScrollView,
+  Alert,
+  Platform,
+  KeyboardAvoidingView,
+  Keyboard,
+  TouchableWithoutFeedback,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { showToast } from "../../utils/toast";
 import appTheme from "../../utils/Theme";
 import styles from "./OtpStyles";
+import userService from "../../services/UserService";
 
 const { COLORS } = appTheme;
-const API_BASE_URL = "https://akj.brightechsoftware.com/api/v1";
 
 function UserServicePage({ navigation }) {
   const [mode, setMode] = useState("login"); // "login", "register", "otp"
@@ -30,37 +35,16 @@ function UserServicePage({ navigation }) {
   const [loading, setLoading] = useState(false);
   const [verifying, setVerifying] = useState(false);
   const [resendTimer, setResendTimer] = useState(0);
+  const [autoCompleteOtp, setAutoCompleteOtp] = useState("");
   const inputRefs = useRef([]);
-
-  // -------------------- API Helper --------------------
-  const apiRequest = async (endpoint, method, body, headers = {}) => {
-    try {
-      const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-        method,
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-          ...headers,
-        },
-        body: body ? JSON.stringify(body) : undefined,
-      });
-
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data?.message || data?.error || "Something went wrong");
-      }
-      return data;
-    } catch (err) {
-      throw new Error(err.message || "Network error");
-    }
-  };
+  const otpInputRef = useRef(null);
+  const scrollViewRef = useRef(null);
+  const inputRefsMap = useRef({});
 
   // -------------------- Effects --------------------
   useEffect(() => {
     if (resendTimer > 0) {
-      const timer = setInterval(() => {
-        setResendTimer((prev) => prev - 1);
-      }, 1000);
+      const timer = setInterval(() => setResendTimer(prev => prev - 1), 1000);
       return () => clearInterval(timer);
     }
   }, [resendTimer]);
@@ -68,6 +52,14 @@ function UserServicePage({ navigation }) {
   useEffect(() => {
     if (otp.join("").length === 6) handleVerifyOtp();
   }, [otp]);
+
+  // Handle auto-complete OTP
+  useEffect(() => {
+    if (autoCompleteOtp && autoCompleteOtp.length === 6) {
+      const otpArray = autoCompleteOtp.split("");
+      setOtp(otpArray);
+    }
+  }, [autoCompleteOtp]);
 
   // -------------------- Handlers --------------------
   const handlePhoneChange = (text) => {
@@ -86,6 +78,27 @@ function UserServicePage({ navigation }) {
     else if (!val && idx > 0) inputRefs.current[idx - 1]?.focus();
   };
 
+  // Handle auto-complete OTP input
+  const handleAutoCompleteOtpChange = (text) => {
+    // Remove any non-numeric characters
+    const cleanedText = text.replace(/\D/g, "");
+    
+    if (cleanedText.length <= 6) {
+      setAutoCompleteOtp(cleanedText);
+      
+      // If we have 6 digits, auto-fill the individual OTP inputs
+      if (cleanedText.length === 6) {
+        const otpArray = cleanedText.split("");
+        setOtp(otpArray);
+      }
+    }
+  };
+
+  // Dismiss keyboard when tapping outside
+  const dismissKeyboard = () => {
+    Keyboard.dismiss();
+  };
+
   // -------------------- API Actions --------------------
   const handleRegister = async () => {
     if (!username || !email || !phoneNumber || !password) {
@@ -99,29 +112,33 @@ function UserServicePage({ navigation }) {
     }
 
     setLoading(true);
-    try {
-      const res = await apiRequest("/user/register", "POST", {
-        username,
-        email,
-        contactNumber: phoneNumber,
-        password,
-      });
+    const res = await userService.registerUser({ username, email, contactNumber: phoneNumber, password });
 
-      // 🔹 Store basic user info locally
-      await AsyncStorage.setItem("userPhoneNumber", phoneNumber);
-      await AsyncStorage.setItem("userEmail", email);
-      await AsyncStorage.setItem("username", username);
-      console.log("User registered successfully:", { username, email, phoneNumber });
-
+    if (res.success) {
+      await AsyncStorage.setItem("tempPhoneNumber", phoneNumber);
       showToast("Registration successful! OTP sent.");
       setMode("otp");
       setResendTimer(30);
       setOtp(["", "", "", "", "", ""]);
-    } catch (err) {
-      showToast(err.message);
-    } finally {
-      setLoading(false);
+      setAutoCompleteOtp(""); // Clear auto-complete input
+    } else {
+      if (res.error?.toLowerCase().includes("contact number already exists")) {
+        Alert.alert(
+          "Number Already Registered",
+          "This phone number is already registered. Would you like to login instead?",
+          [
+            { text: "Cancel", style: "cancel" },
+            { text: "Login", onPress: () => { setMode("login"); setContactOrEmailOrUsername(phoneNumber); } }
+          ]
+        );
+      } else if (res.error?.toLowerCase().includes("email already exists")) {
+        showToast("This email is already registered. Please use another email.");
+        setEmail("");
+      } else {
+        showToast(res.error || "Registration failed");
+      }
     }
+    setLoading(false);
   };
 
   const handleVerifyOtp = async () => {
@@ -129,263 +146,298 @@ function UserServicePage({ navigation }) {
     if (otpValue.length !== 6) return;
 
     setVerifying(true);
-    try {
-      const response = await fetch(`${API_BASE_URL}/user/verify-otp`, {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: new URLSearchParams({ contactNumber: phoneNumber, otp: otpValue }).toString(),
-      });
+    const tempPhoneNumber = await AsyncStorage.getItem("tempPhoneNumber");
+    if (!tempPhoneNumber) {
+      showToast("Phone number not found. Please try registering again.");
+      setVerifying(false);
+      return;
+    }
 
-      const data = await response.json();
-      if (!response.ok) throw new Error(data?.error || "Invalid OTP");
+    const res = await userService.verifyOtp(tempPhoneNumber, otpValue);
 
-      // 🔹 Save OTP verification + phone number
-      await AsyncStorage.setItem("isOtpVerified", "true");
-      await AsyncStorage.setItem("userPhoneNumber", phoneNumber);
-
+    if (res.success) {
       showToast("OTP verified successfully!");
       setMode("login");
-    } catch (err) {
-      showToast(err.message);
-    } finally {
-      setVerifying(false);
+      await AsyncStorage.removeItem("tempPhoneNumber");
+      setUsername(""); setEmail(""); setPhoneNumber(""); setPassword("");
+      setAutoCompleteOtp(""); // Clear auto-complete input
+    } else {
+      showToast(res.error || "OTP verification failed");
+    }
+    setVerifying(false);
+  };
+
+  const handleResendOtp = async () => {
+    if (resendTimer > 0) return;
+
+    const tempPhoneNumber = await AsyncStorage.getItem("tempPhoneNumber");
+    if (!tempPhoneNumber) return showToast("Phone number not found. Please try registering again.");
+
+    // If backend has a resend OTP endpoint, call it. Otherwise, reuse register or verifyOtp API.
+    const res = await userService.verifyOtp(tempPhoneNumber, ""); // placeholder if resend API not available
+    if (res.success) {
+      showToast("OTP resent successfully!");
+      setResendTimer(30);
+    } else {
+      showToast(res.error || "Failed to resend OTP");
     }
   };
 
-const handleLogin = async () => {
-  if (!contactOrEmailOrUsername || !password) {
-    return showToast("Please enter email/username and password");
-  }
-  setLoading(true);
-  try {
-    const data = await apiRequest("/user/login", "POST", {
-      contactOrEmailOrUsername,
-      password,
-    });
+  const handleLogin = async () => {
+    if (!contactOrEmailOrUsername || !password) return showToast("Please enter email/username and password");
 
-    // 🔹 Save token
-    await AsyncStorage.setItem("authToken", data.token);
+    setLoading(true);
+    const res = await userService.loginUser({ contactOrEmailOrUsername, password });
 
-    // 🔹 Save user details
-    await AsyncStorage.setItem("userId", String(data.id));
-    await AsyncStorage.setItem("userEmail", data.email);
-    await AsyncStorage.setItem("username", data.username);
-    await AsyncStorage.setItem("userPhoneNumber", data.contact);
+    if (res.success && res.data) {
+      const data = res.data;
+      await AsyncStorage.setItem("authToken", data.token);
+      await AsyncStorage.setItem("userId", String(data.id));
+      await AsyncStorage.setItem("userEmail", data.email);
+      await AsyncStorage.setItem("username", data.username);
+      await AsyncStorage.setItem("userPhoneNumber", data.contact);
+      await AsyncStorage.setItem("userData", JSON.stringify(data));
 
-    // 🔹 Save full user object too (optional)
-    await AsyncStorage.setItem("userData", JSON.stringify(data));
-
-    console.log("user logged in successfully:", data);
-
-    showToast("Login successful!");
-    navigation.navigate("MpinScreen", { step: 3 });
-  } catch (err) {
-    showToast(err.message);
-  } finally {
+      showToast("Login successful!");
+      navigation.navigate("MpinScreen", { step: 3 });
+    } else {
+      showToast(res.error || "Login failed");
+    }
     setLoading(false);
-  }
-};
-
+  };
 
   // -------------------- UI --------------------
   return (
-    <ImageBackground source={require("../../assets/bg2.jpg")} style={styles.backgroundImage}>
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <View style={styles.container}>
-          <View style={styles.logoContainer}>
-            <Image source={require("../../assets/logo2.png")} style={styles.logoImage} />
-          </View>
+    <TouchableWithoutFeedback onPress={dismissKeyboard}>
+      <ImageBackground source={require("../../assets/bg.jpg")} style={styles.backgroundImage}>
+        <KeyboardAvoidingView 
+          style={{ flex: 1 }}
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          keyboardVerticalOffset={Platform.OS === "ios" ? 64 : 0}
+        >
+          <ScrollView 
+            ref={scrollViewRef}
+            contentContainerStyle={styles.scrollContainer}
+            keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={false}
+          >
+            <View style={styles.container}>
+              <View style={styles.logoContainer}>
+                <Image source={require("../../assets/logo2.png")} style={styles.logoImage} />
+              </View>
 
-          <View style={styles.card}>
-            <Text style={styles.title}>
-              {mode === "otp" ? "Verify OTP" : mode === "register" ? "Register" : "Login"}
-            </Text>
-            <Text style={styles.subtitle}>
-              {mode === "otp"
-                ? "Enter the 6-digit OTP sent to your phone"
-                : mode === "register"
-                ? "Create a new account"
-                : "Sign in to continue"}
-            </Text>
+              <View style={styles.card}>
+                <Text style={styles.title}>
+                  {mode === "otp" ? "Verify OTP" : mode === "register" ? "Register" : "Login"}
+                </Text>
+                <Text style={styles.subtitle}>
+                  {mode === "otp"
+                    ? "Enter the 6-digit OTP sent to your phone"
+                    : mode === "register"
+                    ? "Create a new account"
+                    : "Sign in to continue"}
+                </Text>
 
-            {/* Register */}
-            {mode === "register" && (
-              <>
-                <Text style={styles.label}>Username</Text>
-                <TextInput
-                  style={styles.input}
-                  value={username}
-                  onChangeText={setUsername}
-                  placeholder="Enter username"
-                  placeholderTextColor={COLORS.textLight}
-                />
-                <Text style={styles.label}>Email</Text>
-                <TextInput
-                  style={styles.input}
-                  value={email}
-                  onChangeText={setEmail}
-                  placeholder="Enter email"
-                  placeholderTextColor={COLORS.textLight}
-                  keyboardType="email-address"
-                />
-                <Text style={styles.label}>Mobile Number</Text>
-                <View style={[styles.inputContainer, !isPhoneValid && styles.inputError]}>
-                  <Text style={styles.countryCode}>+91</Text>
-                  <TextInput
-                    style={styles.phoneInput}
-                    keyboardType="phone-pad"
-                    value={phoneNumber}
-                    onChangeText={handlePhoneChange}
-                    placeholder="Enter 10-digit number"
-                    placeholderTextColor={COLORS.textLight}
-                    maxLength={10}
-                  />
-                </View>
-                {!isPhoneValid && phoneNumber.length > 0 && (
-                  <Text style={styles.errorText}>Please enter a valid mobile number</Text>
-                )}
-                <Text style={styles.label}>Password</Text>
-                <TextInput
-                  style={styles.input}
-                  value={password}
-                  onChangeText={setPassword}
-                  placeholder="Enter password"
-                  placeholderTextColor={COLORS.textLight}
-                  secureTextEntry
-                />
-                <TouchableOpacity
-                  style={[styles.primaryButton, loading && styles.disabledButton]}
-                  onPress={handleRegister}
-                  disabled={loading}
-                >
-                  <LinearGradient
-                    colors={loading ? ["#555", "#444"] : [COLORS.primary, COLORS.secondary]}
-                    style={styles.buttonGradient}
-                  >
-                    {loading ? (
-                      <ActivityIndicator color={COLORS.black} />
-                    ) : (
-                      <Text style={styles.primaryButtonText}>Register</Text>
-                    )}
-                  </LinearGradient>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => setMode("login")}>
-                  <Text style={styles.linkText}>Already have an account? Login</Text>
-                </TouchableOpacity>
-              </>
-            )}
-
-            {/* OTP */}
-            {mode === "otp" && (
-              <>
-                <Text style={styles.label}>Enter OTP</Text>
-                <Text style={styles.otpSubtitle}>Sent to +91 {phoneNumber}</Text>
-                <View style={styles.otpContainer}>
-                  {otp.map((digit, index) => (
-                    <LinearGradient
-                      key={index}
-                      colors={
-                        digit ? [COLORS.primary, COLORS.secondary] : [COLORS.card, COLORS.background]
-                      }
-                      style={styles.otpInputWrapper}
-                    >
+                {/* Register */}
+                {mode === "register" && (
+                  <>
+                    <Text style={styles.label}>Username</Text>
+                    <TextInput
+                      style={styles.input}
+                      value={username}
+                      onChangeText={setUsername}
+                      placeholder="Enter username"
+                      placeholderTextColor={COLORS.label}
+                    />
+                    <Text style={styles.label}>Email</Text>
+                    <TextInput
+                      style={styles.input}
+                      value={email}
+                      onChangeText={setEmail}
+                      placeholder="Enter email"
+                      placeholderTextColor={COLORS.textLight}
+                      keyboardType="email-address"
+                    />
+                    <Text style={styles.label}>Mobile Number</Text>
+                    <View style={[styles.inputContainer, !isPhoneValid && styles.inputError]}>
+                      <Text style={styles.countryCode}>+91</Text>
                       <TextInput
-                        ref={(ref) => (inputRefs.current[index] = ref)}
-                        style={styles.otpInput}
+                        style={styles.phoneInput}
+                        keyboardType="phone-pad"
+                        value={phoneNumber}
+                        onChangeText={handlePhoneChange}
+                        placeholder="Enter 10-digit number"
+                        placeholderTextColor={COLORS.textLight}
+                        maxLength={10}
+                      />
+                    </View>
+                    {!isPhoneValid && phoneNumber.length > 0 && (
+                      <Text style={styles.errorText}>Please enter a valid mobile number</Text>
+                    )}
+                    <Text style={styles.label}>Password</Text>
+                    <TextInput
+                      style={styles.input}
+                      value={password}
+                      onChangeText={setPassword}
+                      placeholder="Enter password"
+                      placeholderTextColor={COLORS.textLight}
+                      secureTextEntry
+                    />
+                    <TouchableOpacity
+                      style={[styles.primaryButton, loading && styles.disabledButton]}
+                      onPress={handleRegister}
+                      disabled={loading}
+                    >
+                      <LinearGradient
+                        colors={loading ? ["#555", "#444"] : [COLORS.gradientcolor1, COLORS.gradientcolor2]}
+                        style={styles.buttonGradient}
+                      >
+                        {loading ? (
+                          <ActivityIndicator color={COLORS.black} />
+                        ) : (
+                          <Text style={styles.primaryButtonText}>Register</Text>
+                        )}
+                      </LinearGradient>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() => setMode("login")}>
+                      <Text style={styles.linkText}>Already have an account? Login</Text>
+                    </TouchableOpacity>
+                  </>
+                )}
+
+                {/* OTP */}
+                {mode === "otp" && (
+                  <>
+                    <Text style={styles.label}>Enter OTP</Text>
+                    <Text style={styles.otpSubtitle}>Sent to +91 {phoneNumber}</Text>
+                    
+                    {/* Auto-complete OTP Input */}
+                    <View style={styles.autoCompleteContainer}>
+                      <Text style={styles.autoCompleteLabel}>Auto-complete OTP (from SMS)</Text>
+                      <Text style={styles.autoCompleteHint}>
+                        This field will automatically detect OTP from SMS messages
+                      </Text>
+                      <TextInput
+                        ref={otpInputRef}
+                        style={styles.autoCompleteInput}
+                        value={autoCompleteOtp}
+                        onChangeText={handleAutoCompleteOtpChange}
+                        placeholder="Enter 6-digit OTP"
+                        placeholderTextColor={COLORS.textLight}
                         keyboardType="numeric"
-                        maxLength={1}
-                        value={digit}
-                        onChangeText={(val) => handleOtpChange(val, index)}
-                        textAlign="center"
+                        maxLength={6}
+                        autoComplete="sms-otp"
+                        textContentType="oneTimeCode"
                         selectionColor={COLORS.primary}
                       />
-                    </LinearGradient>
-                  ))}
-                </View>
-                <TouchableOpacity
-                  style={[styles.primaryButton, verifying && styles.disabledButton]}
-                  onPress={handleVerifyOtp}
-                  disabled={verifying}
-                >
-                  <LinearGradient
-                    colors={verifying ? ["#555", "#444"] : [COLORS.primary, COLORS.secondary]}
-                    style={styles.buttonGradient}
-                  >
-                    {verifying ? (
-                      <ActivityIndicator color={COLORS.black} />
-                    ) : (
-                      <Text style={styles.primaryButtonText}>Verify OTP</Text>
-                    )}
-                  </LinearGradient>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.resendContainer}
-                  onPress={resendTimer === 0 ? handleRegister : null}
-                  disabled={resendTimer > 0}
-                >
-                  <Text style={styles.resendText}>Didn't receive OTP? </Text>
-                  <Text
-                    style={[styles.resendLink, resendTimer > 0 && styles.resendDisabled]}
-                  >
-                    {resendTimer > 0 ? `Resend in ${resendTimer}s` : "Resend"}
-                  </Text>
-                </TouchableOpacity>
-              </>
-            )}
+                    </View>
 
-            {/* Login */}
-            {mode === "login" && (
-              <>
-                <Text style={styles.label}>Email or Username</Text>
-                <TextInput
-                  style={styles.input}
-                  value={contactOrEmailOrUsername}
-                  onChangeText={setContactOrEmailOrUsername}
-                  placeholder="Enter email or username"
-                  placeholderTextColor={COLORS.textLight}
-                />
-                <Text style={styles.label}>Password</Text>
-                <TextInput
-                  style={styles.input}
-                  value={password}
-                  onChangeText={setPassword}
-                  placeholder="Enter password"
-                  placeholderTextColor={COLORS.textLight}
-                  secureTextEntry
-                />
-                <TouchableOpacity
-                  style={[styles.primaryButton, loading && styles.disabledButton]}
-                  onPress={handleLogin}
-                  disabled={loading}
-                >
-                  <LinearGradient
-                    colors={loading ? ["#555", "#444"] : [COLORS.primary, COLORS.secondary]}
-                    style={styles.buttonGradient}
-                  >
-                    {loading ? (
-                      <ActivityIndicator color={COLORS.black} />
-                    ) : (
-                      <Text style={styles.primaryButtonText}>Login</Text>
-                    )}
-                  </LinearGradient>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => setMode("register")}>
-                  <Text style={styles.linkText}>Don't have an account? Register</Text>
-                </TouchableOpacity>
-              </>
-            )}
-          </View>
-        </View>
-      </ScrollView>
-      {(loading || verifying) && (
-        <View style={styles.loadingOverlay}>
-          <ActivityIndicator size="large" color={COLORS.primary} />
-          <Text style={styles.loadingText}>
-            {verifying ? "Verifying OTP..." : "Processing..."}
-          </Text>
-        </View>
-      )}
-    </ImageBackground>
+                    <Text style={styles.orText}>OR</Text>
+                    <Text style={styles.manualLabel}>Enter manually</Text>
+                    
+                    {/* Manual OTP Input */}
+                    <View style={styles.otpContainer}>
+                      {otp.map((digit, index) => (
+                        <LinearGradient
+                          key={index}
+                          colors={digit ? [COLORS.primary, COLORS.secondary] : [COLORS.card, COLORS.background]}
+                          style={styles.otpInputWrapper}
+                        >
+                          <TextInput
+                            ref={(ref) => (inputRefs.current[index] = ref)}
+                            style={styles.otpInput}
+                            keyboardType="numeric"
+                            maxLength={1}
+                            value={digit}
+                            onChangeText={(val) => handleOtpChange(val, index)}
+                            textAlign="center"
+                            selectionColor={COLORS.primary}
+                          />
+                        </LinearGradient>
+                      ))}
+                    </View>
+                    <TouchableOpacity
+                      style={[styles.primaryButton, verifying && styles.disabledButton]}
+                      onPress={handleVerifyOtp}
+                      disabled={verifying}
+                    >
+                      <LinearGradient
+                        colors={verifying ? ["#555", "#444"] : [COLORS.gradientcolor1, COLORS.gradientcolor2]}
+                        style={styles.buttonGradient}
+                      >
+                        {verifying ? (
+                          <ActivityIndicator color={COLORS.black} />
+                        ) : (
+                          <Text style={styles.primaryButtonText}>Verify OTP</Text>
+                        )}
+                      </LinearGradient>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={styles.resendContainer}
+                      onPress={handleResendOtp}
+                      disabled={resendTimer > 0}
+                    >
+                      <Text style={styles.resendText}>Didn't receive OTP? </Text>
+                      <Text style={[styles.resendLink, resendTimer > 0 && styles.resendDisabled]}>
+                        {resendTimer > 0 ? `Resend in ${resendTimer}s` : "Resend"}
+                      </Text>
+                    </TouchableOpacity>
+                  </>
+                )}
+
+                {/* Login */}
+                {mode === "login" && (
+                  <>
+                    <Text style={styles.label}>Email or Phone</Text>
+                    <TextInput
+                      style={styles.input}
+                      value={contactOrEmailOrUsername}
+                      onChangeText={setContactOrEmailOrUsername}
+                      placeholder="Enter email or phone"
+                      placeholderTextColor={COLORS.textLight}
+                    />
+                    <Text style={styles.label}>Password</Text>
+                    <TextInput
+                      style={styles.input}
+                      value={password}
+                      onChangeText={setPassword}
+                      placeholder="Enter password"
+                      placeholderTextColor={COLORS.textLight}
+                      secureTextEntry
+                    />
+                    <TouchableOpacity
+                      style={[styles.primaryButton, loading && styles.disabledButton]}
+                      onPress={handleLogin}
+                      disabled={loading}
+                    >
+                      <LinearGradient
+                        colors={loading ? ["#555", "#444"] : [COLORS.gradientcolor1, COLORS.gradientcolor2]}
+                        style={styles.buttonGradient}
+                      >
+                        {loading ? (
+                          <ActivityIndicator color={COLORS.black} />
+                        ) : (
+                          <Text style={styles.primaryButtonText}>Login</Text>
+                        )}
+                      </LinearGradient>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() => setMode("register")}>
+                      <Text style={styles.linkText}>Don't have an account? Register</Text>
+                    </TouchableOpacity>
+                  </>
+                )}
+              </View>
+            </View>
+          </ScrollView>
+          {(loading || verifying) && (
+            <View style={styles.loadingOverlay}>
+              <ActivityIndicator size="large" color={COLORS.primary} />
+              <Text style={styles.loadingText}>{verifying ? "Verifying OTP..." : "Processing..."}</Text>
+            </View>
+          )}
+        </KeyboardAvoidingView>
+      </ImageBackground>
+    </TouchableWithoutFeedback>
   );
 }
 

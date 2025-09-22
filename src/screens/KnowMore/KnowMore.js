@@ -51,7 +51,7 @@ function KnowMore() {
   return (
     <View style={styles.container}>
       <ImageBackground
-        source={require("../../assets/bg2.jpg")}
+        source={require("../../assets/bg.jpg")}
         style={styles.backgroundImage}
         resizeMode="cover"
       >
@@ -230,7 +230,8 @@ const styles = StyleSheet.create({
     paddingBottom: SIZES.padding * 2,
   },
   content: {
-    backgroundColor: 'rgba(26, 26, 26, 0.95)',
+    // backgroundColor: 'rgba(26, 26, 26, 0.95)',
+    backgroundColor: COLORS.outline,
     margin: SIZES.margin,
     borderRadius: SIZES.radius_lg,
     padding: SIZES.padding,
@@ -348,7 +349,7 @@ const styles = StyleSheet.create({
   joinButtonText: {
     ...FONTS.fontSm,
     fontWeight: 'bold',
-    color: COLORS.text,
+    color: COLORS.white,
     textAlign: 'center',
   },
   closeButtonText: {

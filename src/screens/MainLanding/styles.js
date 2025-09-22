@@ -1,7 +1,7 @@
 import { StyleSheet, Dimensions } from 'react-native';
 import appTheme from '../../utils/Theme';
 
-const { COLORS, SIZES } = appTheme;
+const { COLORS, SIZES, FONTS } = appTheme;
 const { height, width } = Dimensions.get('window');
 
 export default StyleSheet.create({
@@ -49,7 +49,7 @@ export default StyleSheet.create({
     paddingBottom: SIZES.padding / 2,
   },
   faqIconContainer: {
-    backgroundColor: COLORS.secondary,
+    backgroundColor: COLORS.background,
     borderRadius: SIZES.radius_lg,
     padding: SIZES.padding / 1.5,
     alignItems: 'center',
@@ -61,7 +61,7 @@ export default StyleSheet.create({
     shadowRadius: 3,
   },
   menuIconContainer: {
-    backgroundColor: COLORS.secondary,
+    backgroundColor: COLORS.background,
     borderRadius: SIZES.radius_lg,
     padding: SIZES.padding / 1.5,
     alignItems: 'center',
@@ -251,16 +251,18 @@ export default StyleSheet.create({
     color: COLORS.title,
     fontSize: SIZES.fontLg,
     fontFamily: 'TimesNewRoman',
-    fontWeight: '700',
+    // fontWeight: '700',
     marginVertical: SIZES.margin / 2,
     textAlign: 'left',
     letterSpacing: 0.3,
+    ...FONTS.heading,
   },
   contentText1: {
     color: COLORS.textLight,
     fontSize: SIZES.fontSm,
-    fontFamily: 'TimesNewRoman',
+    // fontFamily: 'TimesNewRoman',
     opacity: 0.9,
+    ...FONTS.subheading,
   },
   youtubeContainer: {
     flex: 1,

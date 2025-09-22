@@ -160,7 +160,7 @@ const DrawerMenu = ({ isVisible, onClose }) => {
                   <MaterialIcons
                     name="account-circle"
                     size={82}
-                    color={COLORS.title}
+                    color={COLORS.white}
                   />
                 </View>
               </View>

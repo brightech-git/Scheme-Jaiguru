@@ -1,7 +1,7 @@
 import { StyleSheet } from "react-native";
 import appTheme from "../../utils/Theme";
 
-const { COLORS } = appTheme;
+const { COLORS, FONTS, SIZES } = appTheme;
 
 export default StyleSheet.create({
   backgroundImage: {
@@ -17,14 +17,15 @@ export default StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     padding: 20,
+    marginBottom: 70,
   },
   logoContainer: {
     alignItems: "center",
     marginBottom: 20,
   },
   logoImage: {
-    width: 100,
-    height: 100,
+    width: 170,
+    height: 170,
     resizeMode: "contain",
   },
   card: {
@@ -40,23 +41,49 @@ export default StyleSheet.create({
     elevation: 5,
   },
   title: {
-    fontSize: 24,
-    fontWeight: "bold",
+    // fontSize: 24,
+    // fontWeight: "bold",
     color: COLORS.text,
     textAlign: "center",
     marginBottom: 10,
+    ...FONTS.h2,
   },
   subtitle: {
-    fontSize: 16,
+    fontSize: 26,
     color: COLORS.textLight,
     textAlign: "center",
     marginBottom: 20,
+    ...FONTS.body
   },
   label: {
     fontSize: 16,
-    color: COLORS.text,
+    color: COLORS.title,
     marginBottom: 8,
+    ...FONTS.heading
   },
+  autoDetectContainer: {
+  marginBottom: 10,
+  padding: 10,
+  backgroundColor: COLORS.primary + '20',
+  borderRadius: 8,
+  alignItems: 'center',
+},
+autoDetectText: {
+  color: COLORS.primary,
+  fontSize: 12,
+},
+pasteButton: {
+  marginBottom: 15,
+  padding: 10,
+  backgroundColor: COLORS.secondary + '20',
+  borderRadius: 8,
+  alignItems: 'center',
+},
+pasteText: {
+  color: COLORS.secondary,
+  fontSize: 14,
+  fontWeight: 'bold',
+},
   input: {
     backgroundColor: COLORS.background,
     borderRadius: 8,
@@ -64,6 +91,8 @@ export default StyleSheet.create({
     fontSize: 16,
     color: COLORS.text,
     marginBottom: 12,
+    ...FONTS.subheading,
+   
   },
   inputContainer: {
     flexDirection: "row",
@@ -119,6 +148,48 @@ export default StyleSheet.create({
     textAlign: "center",
     marginBottom: 12,
   },
+  autoCompleteContainer: {
+    marginBottom: 15,
+  },
+  autoCompleteLabel: {
+    fontSize: 14,
+    color: COLORS.primary,
+    marginBottom: 4,
+    fontWeight: "600",
+    textAlign: "center",
+  },
+  autoCompleteHint: {
+    fontSize: 12,
+    color: COLORS.textLight,
+    marginBottom: 8,
+    textAlign: "center",
+    fontStyle: "italic",
+  },
+  autoCompleteInput: {
+    backgroundColor: COLORS.background,
+    borderRadius: 8,
+    padding: 15,
+    fontSize: 18,
+    color: COLORS.text,
+    textAlign: "center",
+    borderWidth: 2,
+    borderColor: COLORS.primary,
+    letterSpacing: 2,
+    fontWeight: "bold",
+  },
+  orText: {
+    fontSize: 16,
+    color: COLORS.textLight,
+    textAlign: "center",
+    marginVertical: 10,
+    fontWeight: "600",
+  },
+  manualLabel: {
+    fontSize: 14,
+    color: COLORS.textLight,
+    marginBottom: 8,
+    textAlign: "center",
+  },
   primaryButton: {
     borderRadius: 8,
     overflow: "hidden",
@@ -154,10 +225,11 @@ export default StyleSheet.create({
     color: COLORS.textLight,
   },
   linkText: {
-    color: COLORS.primary,
-    fontSize: 14,
+    color: COLORS.title,
+    fontSize: 16,
     textAlign: "center",
     marginTop: 12,
+    ...FONTS.subheading
   },
   loadingOverlay: {
     position: "absolute",

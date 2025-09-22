@@ -3,7 +3,8 @@ import {
   View,
   TouchableOpacity,
   StyleSheet,
-  ActivityIndicator
+  ActivityIndicator,
+  Dimensions
 } from 'react-native'
 import { LinearGradient } from 'expo-linear-gradient'
 import { TextDefault } from '../../components'
@@ -11,6 +12,7 @@ import appTheme from '../../utils/Theme'
 import { scale } from '../../utils'
 
 const { COLORS, SIZES, FONTS } = appTheme
+const { width } = Dimensions.get('window')
 
 function ProductCard({
   productData,
@@ -19,22 +21,24 @@ function ProductCard({
   navigation,
   status,
   accountDetails,
-  style, // ✅ new prop
+  style,
 }) {
   if (loading) {
     return (
-      <ActivityIndicator
-        size="large"
-        color={COLORS.success}
-        style={{ marginTop: scale(20) }}
-      />
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator
+          size="large"
+          color={COLORS.primary}
+          style={{ marginTop: scale(20) }}
+        />
+      </View>
     )
   }
 
   if (error) {
     return (
-      <View style={{ alignItems: 'center', marginTop: scale(20) }}>
-        <TextDefault style={{ color: COLORS.error }}>{error}</TextDefault>
+      <View style={styles.errorContainer}>
+        <TextDefault style={styles.errorText}>{error}</TextDefault>
       </View>
     )
   }
@@ -52,7 +56,7 @@ function ProductCard({
   const isDreamGoldPlan =
     accountDetails?.schemeSummary?.schemeName?.trim() === 'DREAM GOLD PLAN'
 
- return (
+  return (
     <TouchableOpacity
       activeOpacity={0.9}
       onPress={() =>
@@ -62,285 +66,331 @@ function ProductCard({
           accountDetails,
         })
       }
-      style={[styles.cardContainer, style]} // ✅ merged style
+      style={[styles.cardContainer, style]}
     >
       <LinearGradient
-        colors={[COLORS.gradientcolor1, COLORS.gradientcolor2]}
+        colors={[COLORS.primary, COLORS.secondary]}
         start={{ x: 0, y: 0 }}
         end={{ x: 0, y: 1 }}
         style={styles.gradientBackground}
       >
-        {/* Top Section */}
-        <View style={styles.topSection}>
-          <View>
-            <TextDefault style={styles.text} bold>
+        {/* Header Section */}
+        <View style={styles.headerSection}>
+          <View style={styles.headerLeft}>
+            <TextDefault style={styles.productCode} bold numberOfLines={1}>
               {productData.groupcode} - {productData.regno}
-              {isDreamGoldPlan && (
-                <TextDefault style={[styles.text, { marginLeft: scale(10) }]}>
-                  / ₹{accountDetails?.amount || 0}
-                </TextDefault>
-              )}
             </TextDefault>
-            <TextDefault style={styles.text}>{productData.pname}</TextDefault>
+            <TextDefault style={styles.productName} numberOfLines={1}>
+              {productData.pname}
+            </TextDefault>
           </View>
-          <View style={styles.rightTop}>
-            <TextDefault style={styles.text} bold>
+          
+          <View style={styles.headerRight}>
+            <View style={[styles.statusContainer, 
+              status === 'Active' ? styles.statusActive : styles.statusInactive
+            ]}>
+              <TextDefault style={styles.statusText} bold>
+                {status}
+              </TextDefault>
+              <View
+                style={[
+                  styles.statusDot,
+                  { backgroundColor: status === 'Active' ? COLORS.success : COLORS.error }
+                ]}
+              />
+            </View>
+            
+            <TextDefault style={styles.schemeName} bold numberOfLines={1}>
               {accountDetails?.schemeSummary?.schemeName?.trim()}
             </TextDefault>
           </View>
         </View>
 
-        {/* Status */}
-        <View style={styles.statusContainer}>
-          <TextDefault style={styles.text} bold>
-            {status}
-          </TextDefault>
-          <View
-            style={[
-              styles.statusDot,
-              { backgroundColor: status === 'Active' ? COLORS.success : COLORS.error }
-            ]}
-          />
-        </View>
-
-        {/* Center Section */}
-        <View style={styles.centerSection}>
-          <View style={styles.headerRow}>
-            <View style={styles.headerTextContainer}>
-              <TextDefault style={[styles.text, styles.headerText]}>
-                {isDreamGoldPlan ? 'Ins Paid' : 'Weight Saved*'}
-              </TextDefault>
-            </View>
-            <View style={styles.headerTextContainer}>
-              <TextDefault style={[styles.text, styles.headerText]}>
-                Total Amount *
-              </TextDefault>
-            </View>
+        {/* Stats Section */}
+        <View style={styles.statsSection}>
+          <View style={styles.statItem}>
+            <TextDefault style={styles.statLabel}>
+              {isDreamGoldPlan ? 'Ins Paid' : 'Weight Saved'}
+            </TextDefault>
+            <TextDefault style={styles.statValue}>
+              {isDreamGoldPlan
+                ? `${accountDetails?.schemeSummary?.schemaSummaryTransBalance?.insPaid || 0}/${accountDetails?.schemeSummary?.instalment || 0}`
+                : `${productData.amountWeight?.Weight || 0} g`}
+            </TextDefault>
           </View>
-          <View style={styles.valueRow}>
-            <View style={styles.valueTextContainer}>
-              <TextDefault style={[styles.text, styles.headerText]}>
-                {isDreamGoldPlan
-                  ? `${accountDetails?.schemeSummary?.schemaSummaryTransBalance?.insPaid || 0} / ${accountDetails?.schemeSummary?.instalment || 0}`
-                  : `${productData.amountWeight?.Weight || 0} g`}
-              </TextDefault>
-            </View>
-            <View style={styles.valueTextContainer}>
-              <TextDefault style={[styles.text, styles.headerText]}>
-                {productData.amountWeight?.Amount || 0} ₹
-              </TextDefault>
-            </View>
+
+          <View style={styles.statDivider} />
+
+          <View style={styles.statItem}>
+            <TextDefault style={styles.statLabel}>
+              Total Amount
+            </TextDefault>
+            <TextDefault style={styles.statValue}>
+              ₹{productData.amountWeight?.Amount || 0}
+            </TextDefault>
+          </View>
+
+          <View style={styles.statDivider} />
+
+          <View style={styles.statItem}>
+            <TextDefault style={styles.statLabel}>
+              {isDreamGoldPlan ? 'Amount Saved' : 'Weight Saved'}
+            </TextDefault>
+            <TextDefault style={styles.statValue}>
+              {isDreamGoldPlan
+                ? `₹${accountDetails?.schemeSummary?.schemaSummaryTransBalance?.amtrecd || 0}`
+                : `${productData.amountWeight?.Weight || 0} g`}
+            </TextDefault>
           </View>
         </View>
 
-        {/* Divider */}
-        {/* <View style={styles.divider} /> */}
-
-        {/* Bottom Section */}
-        <View style={styles.bottomSection}>
-          {/* Circle */}
-          <View style={styles.circleContainer}>
-            <View style={styles.weightCircle}>
-              <TextDefault style={styles.weightText}>
-                {isDreamGoldPlan ? 'Amount Saved' : 'Weight Saved'}
-              </TextDefault>
-              <TextDefault style={styles.weightValue}>
-                {isDreamGoldPlan
-                  ? `₹${accountDetails?.schemeSummary?.schemaSummaryTransBalance?.amtrecd || 0}`
-                  : `${productData.amountWeight?.Weight || 0} g`}
-              </TextDefault>
-            </View>
-          </View>
-
-          {/* Maturity Date */}
-          <View style={styles.dateContainer}>
-            <TextDefault style={styles.maturityText}>Date of Maturity</TextDefault>
-            <TextDefault style={styles.dateText}>
+        {/* Footer Section */}
+        <View style={styles.footerSection}>
+          <View style={styles.maturityContainer}>
+            <TextDefault style={styles.maturityLabel}>
+              Maturity Date
+            </TextDefault>
+            <TextDefault style={styles.maturityDate}>
               {formatDate(productData.maturityDate)}
             </TextDefault>
           </View>
 
-          {/* Buttons */}
-          <View style={styles.buttonContainer}>
+          <View style={styles.buttonGroup}>
             <TouchableOpacity
-              style={styles.payButton}
-              onPress={() =>
+              style={[styles.button, styles.viewButton]}
+              onPress={(e) => {
+                e.stopPropagation();
                 navigation.navigate('ProductDescription', {
                   productData,
                   status,
                   accountDetails
                 })
-              }
+              }}
             >
-              <TextDefault style={styles.payButtonText}>View</TextDefault>
+              <TextDefault style={styles.buttonText}>View</TextDefault>
             </TouchableOpacity>
+            
             <TouchableOpacity
-              style={styles.payButton}
-              onPress={() =>
+              style={[styles.button, styles.payButton]}
+              onPress={(e) => {
+                e.stopPropagation();
                 navigation.navigate('Buy', {
                   productData,
                   status,
                   accountDetails,
                   isDreamGoldPlan
                 })
-              }
+              }}
             >
-              <TextDefault style={styles.payButtonText}>Pay</TextDefault>
+              <TextDefault style={[styles.buttonText, styles.payButtonText]}>
+                Pay
+              </TextDefault>
             </TouchableOpacity>
           </View>
         </View>
+
+        {/* Premium Badge for Dream Gold Plan */}
+        {isDreamGoldPlan && (
+          <View style={styles.premiumBadge}>
+            <TextDefault style={styles.premiumBadgeText}>
+              Premium: ₹{accountDetails?.amount || 0}
+            </TextDefault>
+          </View>
+        )}
       </LinearGradient>
     </TouchableOpacity>
   )
 }
 
 const styles = StyleSheet.create({
- cardContainer: {
-  paddingTop: scale(7),
-  borderRadius: SIZES.radius_lg,
-  overflow: 'hidden',
-  elevation: 6,
-  shadowColor: COLORS.dark,
-  shadowOffset: { width: 0, height: 2 },
-  shadowOpacity: 0.25,
-  shadowRadius: 4,
-  // ❌ remove width: '100%'
-},
-
-  gradientBackground: {
-    borderRadius: SIZES.radius_lg,
-    padding: SIZES.padding / 2
+  loadingContainer: {
+    padding: scale(20),
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  topSection: {
+  errorContainer: {
+    padding: scale(20),
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: COLORS.card,
+    borderRadius: SIZES.radius,
+    margin: scale(10),
+  },
+  errorText: {
+    color: COLORS.error,
+    fontSize: scale(14),
+    textAlign: 'center',
+  },
+  cardContainer: {
+    borderRadius: SIZES.radius_lg,
+    overflow: 'hidden',
+    elevation: 8,
+    shadowColor: COLORS.dark,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+    marginHorizontal: scale(10),
+    marginVertical: scale(8),
+    // height: scale(250),
+  },
+  gradientBackground: {
+    padding: scale(16),
+    position: 'relative',
+  },
+  headerSection: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: scale(20)
+    alignItems: 'flex-start',
+    marginBottom: scale(16),
   },
-  rightTop: {
-    alignItems: 'flex-end'
+  headerLeft: {
+    flex: 1,
+    marginRight: scale(8),
+  },
+  headerRight: {
+    alignItems: 'flex-end',
+  },
+  productCode: {
+    color: COLORS.white,
+    fontSize: scale(16),
+    marginBottom: scale(4),
+    ...FONTS.heading,
+  },
+  productName: {
+    color: COLORS.white,
+    fontSize: scale(12),
+    opacity: 0.9,
+    ...FONTS.heading,
+  },
+  schemeName: {
+    color: COLORS.white,
+    fontSize: scale(12),
+    marginTop: scale(4),
+    opacity: 0.9,
+    ...FONTS.heading,
   },
   statusContainer: {
     flexDirection: 'row',
-    alignSelf: 'flex-end',
     alignItems: 'center',
-    marginTop: scale(-30),
-    marginRight: scale(10)
+    paddingHorizontal: scale(8),
+    paddingVertical: scale(4),
+    borderRadius: SIZES.radius_sm,
+    marginBottom: scale(4),
+    ...FONTS.subheading,
+  },
+  statusActive: {
+    backgroundColor: 'rgba(46, 125, 50, 0.2)',
+  },
+  statusInactive: {
+    backgroundColor: 'rgba(198, 40, 40, 0.2)',
+  },
+  statusText: {
+    color: COLORS.white,
+    fontSize: scale(12),
+    marginRight: scale(4),
   },
   statusDot: {
     width: scale(8),
     height: scale(8),
     borderRadius: scale(4),
-    marginLeft: scale(6)
   },
-  centerSection: {
-    paddingVertical: scale(15),
-    borderRadius: SIZES.radius_sm,
-    marginBottom: scale(8)
-  },
-  headerRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between'
-  },
-  valueRow: {
+  statsSection: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginTop: scale(6)
-  },
-  headerTextContainer: {
-    flex: 1,
-    alignItems: 'center'
-  },
-  valueTextContainer: {
-    flex: 1,
-    alignItems: 'center'
-  },
-  bottomSection: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center'
-  },
-  circleContainer: {
-    alignItems: 'center'
-  },
-  weightCircle: {
-    width: scale(75),
-    height: scale(75),
-    borderRadius: scale(75 / 2),
-    backgroundColor: COLORS.card,
-    justifyContent: 'center',
     alignItems: 'center',
-    padding: scale(8),
-    borderWidth: 2,
-    borderColor: COLORS.accent
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    borderRadius: SIZES.radius,
+    padding: scale(12),
+    marginBottom: scale(16),
   },
-  dateContainer: {
+  statItem: {
+    alignItems: 'center',
     flex: 1,
-    justifyContent: 'center',
-    marginLeft: scale(10),
-    alignItems: 'center'
   },
-  maturityText: {
-    color: COLORS.text,
-    fontSize: scale(12),
-    textAlign: 'center',
-    fontWeight: FONTS.heading.fontWeight
-  },
-  dateText: {
-    color: COLORS.text,
+  statLabel: {
+    color: COLORS.white,
     fontSize: scale(10),
-    marginTop: scale(2),
+    opacity: 0.8,
+    marginBottom: scale(4),
     textAlign: 'center',
-    fontWeight: FONTS.heading.fontWeight
+    ...FONTS.subheading,
   },
-  buttonContainer: {
+  statValue: {
+    color: COLORS.white,
+    fontSize: scale(14),
+   ...FONTS.subheading,
+    textAlign: 'center',
+  },
+  statDivider: {
+    width: 1,
+    height: '70%',
+    backgroundColor: 'rgba(255, 255, 255, 0.3)',
+    marginHorizontal: scale(4),
+  },
+  footerSection: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  maturityContainer: {
     flex: 1,
-    justifyContent: 'center',
-    marginLeft: scale(10),
+  },
+  maturityLabel: {
+    color: COLORS.white,
+    fontSize: scale(10),
+    opacity: 0.8,
+    marginBottom: scale(2),
+    ...FONTS.heading,
+  },
+  maturityDate: {
+    color: COLORS.white,
+    fontSize: scale(12),
+    ...FONTS.subheading,
+
+  },
+  buttonGroup: {
     flexDirection: 'row',
     gap: scale(8),
-    marginTop: scale(16)
+  },
+  button: {
+    paddingVertical: scale(8),
+    paddingHorizontal: scale(16),
+    borderRadius: SIZES.radius_sm,
+    minWidth: scale(60),
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  viewButton: {
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.3)',
   },
   payButton: {
     backgroundColor: COLORS.white,
-    paddingVertical: scale(6),
-    paddingHorizontal: scale(6),
-    borderRadius: SIZES.radius_sm,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: scale(10)
   },
-  text: {
-    color: COLORS.title,
+  buttonText: {
     fontSize: scale(12),
-    fontWeight: FONTS.heading.fontWeight
-  },
-  weightText: {
-    color: COLORS.text,
-    fontSize: scale(8),
-    textAlign: 'center',
-    fontWeight: FONTS.heading.fontWeight
-  },
-  weightValue: {
-    color: COLORS.title,
-    fontSize: scale(10),
-    fontWeight: FONTS.heading.fontWeight,
-    textAlign: 'center'
+    fontWeight: 'bold',
+    ...FONTS.subheading,
   },
   payButtonText: {
-    color: COLORS.dark,
-    fontSize: scale(12),
-    fontWeight: FONTS.heading.fontWeight,
-
-    padding: scale(4),
-   
-    borderRadius: SIZES.radius_sm
+    color: COLORS.primary,
   },
-  divider: {
-    height: scale(2),
-    backgroundColor: COLORS.text,
-    borderRadius: scale(2),
-    marginBottom: scale(10)
-  }
+  premiumBadge: {
+    position: 'absolute',
+    top: scale(16),
+    right: scale(12),
+    backgroundColor: 'rgba(255, 255, 255, 1)',
+    paddingHorizontal: scale(8),
+    paddingVertical: scale(6),
+    borderRadius: SIZES.radius_sm,
+  },
+  premiumBadgeText: {
+    color: COLORS.primary,
+    fontSize: scale(10),
+    fontWeight: 'bold',
+    ...FONTS.body,
+  },
 })
 
 export default ProductCard

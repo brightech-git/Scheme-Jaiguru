@@ -174,12 +174,12 @@ const PaymentHistory = ({ navigation, route }) => {
 
   return (
     <ImageBackground
-      source={require('../../assets/bg2.jpg')}
+      source={require('../../assets/bg.jpg')}
       style={styles.background}
     >
     <SafeAreaView style={styles.container}>
       <LinearGradient
-        colors={COLORS.gradientPrimary}
+        colors={COLORS.gradientPrimary2}
         style={styles.headerGradient}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
@@ -274,7 +274,7 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     ...FONTS.h4,
-    color: COLORS.title,
+    color: COLORS.white,
     textAlign: 'center',
     flex: 1,
   },
@@ -282,7 +282,7 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: COLORS.primaryLight,
+    backgroundColor: COLORS.white,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -313,13 +313,13 @@ const styles = StyleSheet.create({
   },
   schemeName: {
     ...FONTS.h5,
-    color: COLORS.title,
+    color: COLORS.white,
     marginBottom: SIZES.margin,
     textAlign: 'center',
   },
   schemeName1: {
     ...FONTS.h5,
-    color: COLORS.text,
+    color: COLORS.white,
     marginBottom: SIZES.margin,
     textAlign: 'center',
   },
@@ -335,12 +335,12 @@ const styles = StyleSheet.create({
   statValue: {
     ...FONTS.h6,
     fontWeight: '600',
-    color: COLORS.title,
+    color: COLORS.iconPrimary,
     marginBottom: 4,
   },
   statLabel: {
     ...FONTS.h6,
-    color: COLORS.placeholder,
+    color: COLORS.white,
     fontWeight: '500',
     textAlign: 'center',
   },

@@ -3,59 +3,61 @@ const { width, height } = Dimensions.get("screen");
 
 export const COLORS = {
   // Base
-  background: "#000000",   // main app background (black)
-  card: "#1A1A1A",         // card containers
-  surface: "#121212",      // elevated surfaces
-  surfaceVariant: "#1E1E1E",
+  background: "#FFFFFF",   // main app background (white)
+  card: "#F9F9F9",         // card containers
+  surface: "#F5F5F5",      // elevated surfaces
+  surfaceVariant: "#EEEEEE",
 
   // Core Brand
-  primary: "#D4AF37",      // luxury gold (buttons, highlights)
-  primaryLight: "rgba(212, 175, 55, 0.2)", // subtle gold tint
-  secondary: "#8C6C3F",    // bronze accent
-  notification: "#FFD700", // bright gold for alerts
+  primary: "#1c467cff",      // luxury gold
+  primaryLight: "rgba(212, 175, 55, 0.15)", // soft gold tint
+  secondary: "#3A6EA5",    // bronze accent
+  notification: "#C98900", // deep amber-gold for alerts
 
   // Status
-  success: "#4CAF50",      // emerald green (positive)
-  danger: "#E53935",       // ruby red (negative)
-  warning: "#FFC107",      // amber yellow
-  info: "#29B6F6",         // sapphire blue
+  success: "#2E7D32",      // emerald green
+  danger: "#C62828",       // ruby red
+  warning: "#FFA000",      // amber yellow
+  info: "#1565C0",         // sapphire blue
 
   // Text
-  title: "#FFD700",        // gold titles
-  text: "#F5F5F5",         // main text (white-ish)
-  textLight: "#B0B0B0",    // secondary text (muted grey)
-  label: "#A0A0A0",        // for inputs, captions
-  placeholder: "rgba(255, 255, 255, 0.5)",
-  white:"#FFFFFF",
+  title: "#333333",        // dark titles for readability
+  text: "#222222",         // main text (almost black)
+  textLight: "#666666",    // secondary text
+  label: "#757575",        // input labels, captions
+  placeholder: "rgba(0, 0, 0, 0.4)",
+  white: "#FFFFFF",
 
   // Borders & Shadows
-  borderColor: "rgba(255, 255, 255, 0.1)",
-  outline: "#2A2A2A",
-  shadow: "rgba(0, 0, 0, 0.6)",
-  overlay: "rgba(0, 0, 0, 0.7)",
+  borderColor: "rgba(0, 0, 0, 0.1)",
+  outline: "#DDDDDD",
+  shadow: "rgba(0, 0, 0, 0.08)",
+  overlay: "rgba(0, 0, 0, 0.3)",
 
   // Inputs
-  input: "#6E6E6E",        // dark input field
-  darkInput: "#1E1E1E",
+  input: "#F0F0F0",        // light input background
+  darkInput: "#E8E8E8",
 
-  
   // Icons
-  iconPrimary: '#C5A572',
-  iconSecondary: '#6E6E6E',
+  iconPrimary: "#C5A572",
+  iconSecondary: "#888888",
 
   // Gradients
-  gradientPrimary: ['#C5A572', '#8C6C3F'], // React Native
-  gradientSecondary: ['rgba(197,165,114,0.25)', '#C5A572'],
-  gradientText: ['#2E6F95', '#C62828'], // sapphire → ruby
-  gradientBackground: "linear-gradient(135deg, #C5A572, #8C6C3F)", // Web CSS
-
+  gradientPrimary: ["#D4AF37", "#8C6C3F"],
+  gradientSecondary: ["rgba(197,165,114,0.15)", "#D4AF37"],
+  gradientText: ["#2E6F95", "#C62828"], // sapphire → ruby
+  gradientBackground: "linear-gradient(135deg, #F9F9F9, #FFFFFF)",
+  gradientPrimary1: ["#e6e1d4ff", "#e4d9caff"],
+  gradientPrimary2: ["#1c467cff", "#3A6EA5"],
+  gradientPrimary3: ["#ffffffff", "#ffffffff"],
+  gradientPrimary4: ["#DDDDDD", "#DDDDDD"],
   // Productcard
-  gradientcolor1: "#ac7826ff",   // muted gold
-  gradientcolor2: "#8C6C3F",   // bronze
+  gradientcolor1: "#D4AF37", // soft muted gold
+  gradientcolor2: "#e47c1bff", // bronze-gold
 
   // Goldplan
-  gradientcolor3: "#D4AF37",   // classic gold
-  gradientcolor4: "#2E7D32",   // emerald green
+  gradientcolor3: "#D4AF37", // classic gold
+  gradientcolor4: "#2E7D32", // emerald green
 };
 
 export const SIZES = {
@@ -86,7 +88,6 @@ export const SIZES = {
   height,
   container: 800,
 };
-
 
 export const FONTS = {
   // Paragraph styles
@@ -135,7 +136,7 @@ export const FONTS = {
     lineHeight: 32,
   },
   h4: {
-    fontSize: SIZES.h4,
+    fontSize: SIZES.h3,
     color: COLORS.title,
     fontFamily: "DMSerif",
     lineHeight: 28,
@@ -144,6 +145,7 @@ export const FONTS = {
     fontSize: SIZES.h5,
     fontFamily: "DMSerif",
     lineHeight: 26,
+    color: COLORS.title,
   },
   h6: {
     fontSize: SIZES.h6,
@@ -155,7 +157,8 @@ export const FONTS = {
   // Custom semantic roles
   heading: {
     fontFamily: "TrajanProBold",
-    fontWeight: "700",
+    lineHeight: 25,
+    // fontWeight: "700",
   },
   subheading: {
     fontFamily: "DMSerif",
@@ -166,6 +169,8 @@ export const FONTS = {
     fontWeight: "600",
   },
 };
+
+
 export const ICONS = {
 	user: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M20 21V19C20 17.9391 19.5786 16.9217 18.8284 16.1716C18.0783 15.4214 17.0609 15 16 15H8C6.93913 15 5.92172 15.4214 5.17157 16.1716C4.42143 16.9217 4 17.9391 4 19V21" stroke="#757575" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 11C14.2091 11 16 9.20914 16 7C16 4.79086 14.2091 3 12 3C9.79086 3 8 4.79086 8 7C8 9.20914 9.79086 11 12 11Z" stroke="#757575" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
 	lock: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M5 12C4.44772 12 4 12.4477 4 13V20C4 20.5523 4.44772 21 5 21H19C19.5523 21 20 20.5523 20 20V13C20 12.4477 19.5523 12 19 12H5ZM2 13C2 11.3431 3.34315 10 5 10H19C20.6569 10 22 11.3431 22 13V20C22 21.6569 20.6569 23 19 23H5C3.34315 23 2 21.6569 2 20V13Z" fill="#757575"/><path fill-rule="evenodd" clip-rule="evenodd" d="M12 3C10.9391 3 9.92172 3.42143 9.17157 4.17157C8.42143 4.92172 8 5.93913 8 7V11C8 11.5523 7.55228 12 7 12C6.44772 12 6 11.5523 6 11V7C6 5.4087 6.63214 3.88258 7.75736 2.75736C8.88258 1.63214 10.4087 1 12 1C13.5913 1 15.1174 1.63214 16.2426 2.75736C17.3679 3.88258 18 5.4087 18 7V11C18 11.5523 17.5523 12 17 12C16.4477 12 16 11.5523 16 11V7C16 5.93913 15.5786 4.92172 14.8284 4.17157C14.0783 3.42143 13.0609 3 12 3Z" fill="#757575"/></svg>`,

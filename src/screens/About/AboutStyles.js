@@ -69,15 +69,16 @@ export default StyleSheet.create({
   sectionTitle: {
     marginLeft: SIZES.margin / 1.5,
     fontSize: SIZES.h4,
-    fontFamily: FONTS.h4.fontFamily,
-    lineHeight: FONTS.h4.lineHeight,
+    fontFamily: FONTS.h2.fontFamily,
+    // lineHeight: FONTS.h4.lineHeight,
     fontWeight: FONTS.heading.fontWeight,
     color: COLORS.title,
+
   },
   sectionContent: {
-    fontSize: SIZES.font,
-    fontFamily: FONTS.font.fontFamily,
-    lineHeight: SIZES.h5,
+    fontSize: SIZES.h6,
+    fontFamily: FONTS.subheading.fontFamily,
+    lineHeight: SIZES.h4,
     color: COLORS.textLight,
     marginBottom: SIZES.margin / 1.5,
     textAlign: 'justify',
@@ -168,7 +169,7 @@ export default StyleSheet.create({
     fontSize: SIZES.font,
     fontFamily: FONTS.font.fontFamily,
     lineHeight: SIZES.h5,
-    color: COLORS.accent,
+    color: COLORS.white,
     fontWeight: FONTS.subheading.fontWeight,
   },
   promiseBox: {

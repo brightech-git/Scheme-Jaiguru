@@ -19,6 +19,7 @@ const styles = {
     // borderBottomWidth: 1,
     borderBottomColor: COLORS.borderColor,
     marginBottom: scale(20),
+    marginTop: scale(20),
   },
   subContainer: {
     width: '100%',

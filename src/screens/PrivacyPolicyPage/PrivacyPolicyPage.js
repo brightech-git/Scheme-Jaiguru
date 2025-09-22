@@ -1,200 +1,220 @@
-import React from 'react';
-import { 
-  View, 
-  Text, 
-  ScrollView, 
-  StyleSheet, 
+import React, { useEffect, useRef } from 'react';
+import {
+  View,
+  Text,
+  ScrollView,
+  StyleSheet,
   SafeAreaView,
   TouchableOpacity,
   Linking,
   Dimensions,
-  Image
+  Alert,
+  Animated,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import Icon from 'react-native-vector-icons/MaterialIcons';
+import { Ionicons, MaterialIcons, FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
+import appTheme from '../../utils/Theme';
 import { scale, verticalScale } from '../../utils/scaling';
 
-
-
-const bmgColors = {
-  primary: '#D4AF37', // Gold primary color
-  primaryDark: '#B8860B', // Dark gold
-  primaryLight: '#FFD700', // Light gold
-  secondary: '#000000', // Black
-  accent: '#8B4513', // SaddleBrown for contrast
-  background: '#FFF9E6', // Light gold background
-  card: '#FFFFFF', // White cards
-  textPrimary: '#2C2C2C', // Dark text
-  textSecondary: '#555555', // Medium text
-  textLight: '#FFFFFF', // White text
-  border: '#E6D3CA', // Light gold border
-};
-
+const { COLORS, SIZES, FONTS } = appTheme;
 const { width } = Dimensions.get('window');
 
-const PrivacyPolicyPage = () => {
-  const handleExternalLink = (url) => {
-    Linking.openURL(url).catch(err => console.error("Couldn't load page", err));
+const PrivacyPolicyPage = ({ navigation }) => {
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 600,
+      useNativeDriver: true,
+    }).start();
+  }, []);
+
+  const handleExternalLink = async (url) => {
+    try {
+      await Linking.openURL(url);
+    } catch (error) {
+      Alert.alert('Error', 'Unable to open the link. Please try again.');
+    }
   };
 
   const policySections = [
     {
-      title: "Information We Collect",
-      icon: "person",
-      content: "Personal identification details (name, email, phone number, etc.), device information and browsing history, location and IP address."
+      title: 'Information We Collect',
+      icon: 'account-details',
+      iconLib: MaterialCommunityIcons,
+      content: 'Personal identification details (name, email, phone number, etc.), device information and browsing history, location and IP address.',
     },
     {
-      title: "How We Use Your Data",
-      icon: "data-usage",
-      content: "To improve our services and personalize your experience, to communicate offers, promotions, or important updates, for analytics and security enhancement."
+      title: 'How We Use Your Data',
+      icon: 'analytics',
+      iconLib: MaterialIcons,
+      content: 'To improve our services and personalize your experience, to communicate offers, promotions, or important updates, for analytics and security enhancement.',
     },
     {
-      title: "What We Don't Do",
-      icon: "block",
-      content: "We do not sell your personal information. We do not track your location without consent."
+      title: 'What We Don\'t Do',
+      icon: 'block-helper',
+      iconLib: MaterialIcons,
+      content: 'We do not sell your personal information. We do not track your location without consent.',
     },
     {
-      title: "Data Sharing",
-      icon: "share",
-      content: "",
+      title: 'Data Sharing',
+      icon: 'share',
+      iconLib: FontAwesome5,
+      content: '',
       subsections: [
         {
-          title: "We Do Not Share With",
-          content: "Unaffiliated third parties, social media platforms"
+          title: 'We Do Not Share With',
+          content: 'Unaffiliated third parties, social media platforms',
         },
         {
-          title: "We May Share With",
-          content: "Trusted service providers, legal authorities (when required)"
-        }
-      ]
+          title: 'We May Share With',
+          content: 'Trusted service providers, legal authorities (when required)',
+        },
+      ],
     },
     {
-      title: "Security Note",
-      icon: "security",
-      content: "Your data is encrypted and securely stored as per industry standards. We employ the latest security measures to protect your information."
-    }
+      title: 'Security Note',
+      icon: 'shield-check',
+      iconLib: MaterialCommunityIcons,
+      content: 'Your data is encrypted and securely stored as per industry standards. We employ the latest security measures to protect your information.',
+    },
   ];
 
   return (
     <SafeAreaView style={styles.container}>
-      <LinearGradient
-        colors={['#FFF9E6', '#FFEDCC']}
-        style={styles.background}
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
       >
-        <ScrollView 
-          contentContainerStyle={styles.scrollContent}
-          showsVerticalScrollIndicator={false}
-        >
-          {/* Header with Jaiguru Logo */}
-          <LinearGradient
-            colors={[bmgColors.primary, bmgColors.primaryDark]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={styles.header}
+        {/* Header */}
+        <View style={styles.header}>
+          <TouchableOpacity
+            style={styles.backButton}
+            onPress={() => navigation.goBack()}
           >
-            {/* <View style={styles.logoContainer}>
-              <View style={styles.logoPlaceholder}>
-                <Text style={styles.logoText}>BMG</Text>
-              </View>
-              <Text style={styles.logoSubtext}>Jewellers</Text>
-            </View> */}
-            <Text style={styles.title}>Privacy Policy</Text>
-            <Text style={styles.subtitle}>Last updated: {new Date().toLocaleDateString()}</Text>
-          </LinearGradient>
-
-          {/* Introduction */}
-          <View style={styles.introCard}>
-            <Text style={styles.introText}>
-              At Jaiguru Jewellers, we value your privacy and are committed to protecting your personal information. 
-              This policy outlines how we collect, use, and safeguard your data.
+            <Ionicons name="arrow-back" size={SIZES.h4} color={COLORS.white} />
+          </TouchableOpacity>
+          <View style={styles.headerContent}>
+            <Text style={[styles.title, FONTS.h4]}>Privacy Policy</Text>
+            <Text style={[styles.subtitle, FONTS.fontSm]}>
+              Last updated: {new Date().toLocaleDateString()}
             </Text>
           </View>
+        </View>
 
-          {/* Policy Sections */}
-          {policySections.map((section, index) => (
-            <View key={index} style={styles.sectionCard}>
-              <View style={styles.sectionHeader}>
-                <View style={styles.iconContainer}>
-                  <Icon name={section.icon} size={24} color={bmgColors.primary} />
-                </View>
-                <Text style={styles.sectionTitle}>{section.title}</Text>
+        {/* Introduction */}
+        <Animated.View style={[styles.introCard, { opacity: fadeAnim }]}>
+          <View style={styles.introIcon}>
+            <MaterialCommunityIcons name="lock" size={SIZES.h3} color={COLORS.primary} />
+          </View>
+          <Text style={[styles.introText, FONTS.subheading]}>
+            At Jai Guru Jewellers, we value your privacy and are committed to protecting your personal information. 
+            This policy outlines how we collect, use, and safeguard your data.
+          </Text>
+        </Animated.View>
+
+        {/* Policy Sections */}
+        {policySections.map((section, index) => (
+          <Animated.View 
+            key={index} 
+            style={[styles.sectionCard, { opacity: fadeAnim }]}
+          >
+            <View style={styles.sectionHeader}>
+              <View style={styles.iconContainer}>
+                {section.iconLib === MaterialIcons ? (
+                  <MaterialIcons name={section.icon} size={SIZES.h4} color={COLORS.primary} />
+                ) : section.iconLib === FontAwesome5 ? (
+                  <FontAwesome5 name={section.icon} size={SIZES.h4} color={COLORS.primary} />
+                ) : (
+                  <MaterialCommunityIcons name={section.icon} size={SIZES.h4} color={COLORS.primary} />
+                )}
               </View>
-              <Text style={styles.sectionContent}>{section.content}</Text>
-              
-              {section.subsections && section.subsections.map((subsection, subIndex) => (
+              <Text style={[styles.sectionTitle]}>{section.title}</Text>
+            </View>
+            {section.content && (
+              <Text style={[styles.sectionContent]}>{section.content}</Text>
+            )}
+            {section.subsections &&
+              section.subsections.map((subsection, subIndex) => (
                 <View key={subIndex} style={styles.subsection}>
                   <View style={styles.subsectionHeader}>
-                    <View style={styles.bulletPoint} />
-                    <Text style={styles.subsectionTitle}>{subsection.title}</Text>
+                    <View style={[styles.bulletPoint, {backgroundColor: COLORS.secondary}]} />
+                    <Text style={[styles.subsectionTitle, FONTS.subheading]}>
+                      {subsection.title}
+                    </Text>
                   </View>
-                  <Text style={styles.subsectionContent}>{subsection.content}</Text>
+                  <Text style={[styles.subsectionContent]}>
+                    {subsection.content}
+                  </Text>
                 </View>
               ))}
-            </View>
-          ))}
+          </Animated.View>
+        ))}
 
-          {/* Security Badge */}
-          <View style={styles.securityBadge}>
-            <Icon name="verified-user" size={32} color={bmgColors.primary} />
-            <Text style={styles.securityText}>Your Data is Protected with 256-bit Encryption</Text>
-          </View>
+        {/* Security Badge */}
+        <Animated.View style={[styles.securityBadge, { opacity: fadeAnim }]}>
+          <MaterialCommunityIcons name="shield-check" size={SIZES.h3} color={COLORS.primary} />
+          <Text style={[styles.securityText, FONTS.subheading]}>
+            Your Data is Protected with 256-bit Encryption
+          </Text>
+        </Animated.View>
 
-          {/* Additional Information */}
-          <View style={styles.additionalInfo}>
-            <Text style={styles.infoTitle}>Additional Information</Text>
-            
-            <View style={styles.infoItem}>
-              <View style={styles.infoIcon}>
-                <Icon name="language" size={20} color={bmgColors.primary} />
-              </View>
-              <View style={styles.infoContent}>
-                <Text style={styles.infoItemTitle}>Website</Text>
-                <TouchableOpacity onPress={() => handleExternalLink("https://jaigurujewellers.com/")}>
-                  <Text style={styles.link}>https://jaigurujewellers.com/</Text>
-                </TouchableOpacity>
-              </View>
+        {/* Additional Information */}
+        <Animated.View style={[styles.additionalInfo, { opacity: fadeAnim }]}>
+          <Text style={[styles.infoTitle, FONTS.h5]}>Additional Information</Text>
+          <View style={styles.infoItem}>
+            <View style={[styles.infoIcon, {backgroundColor: COLORS.primaryLight}]}>
+              <Ionicons name="globe" size={SIZES.font} color={COLORS.primary} />
             </View>
-            
-            <View style={styles.infoItem}>
-              <View style={styles.infoIcon}>
-                <Icon name="support-agent" size={20} color={bmgColors.primary} />
-              </View>
-              <View style={styles.infoContent}>
-                <Text style={styles.infoItemTitle}>Contact</Text>
-                <Text style={styles.infoItemContent}>For privacy-related questions, please contact our support team at Contact@jaigurujewellers.in</Text>
-              </View>
-            </View>
-            
-            <View style={styles.infoItem}>
-              <View style={styles.infoIcon}>
-                <Icon name="update" size={20} color={bmgColors.primary} />
-              </View>
-              <View style={styles.infoContent}>
-                <Text style={styles.infoItemTitle}>Policy Updates</Text>
-                <Text style={styles.infoItemContent}>We may update this policy periodically. Please check back for changes.</Text>
-              </View>
+            <View style={styles.infoContent}>
+              <Text style={[styles.infoItemTitle, FONTS.subheading]}>Website</Text>
+              <TouchableOpacity onPress={() => handleExternalLink('https://jaigurujewellers.com/')}>
+                <Text style={[styles.link]}>
+                  https://jaigurujewellers.com/
+                </Text>
+              </TouchableOpacity>
             </View>
           </View>
-
-          {/* Consent Footer */}
-          <LinearGradient
-            colors={[bmgColors.primary, bmgColors.primaryDark]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={styles.consentFooter}
-          >
-            <Icon name="done-all" size={24} color={bmgColors.textLight} />
-            <Text style={styles.consentText}>
-              By using our services, you consent to our privacy policy.
-            </Text>
-          </LinearGradient>
-
-          {/* Copyright */}
-          <View style={styles.copyright}>
-            <Text style={styles.copyrightText}>© {new Date().getFullYear()} Jaiguru Jewellers. All rights reserved.</Text>
+          <View style={styles.infoItem}>
+            <View style={[styles.infoIcon, {backgroundColor: COLORS.primaryLight}]}>
+              <Ionicons name="mail" size={SIZES.font} color={COLORS.primary} />
+            </View>
+            <View style={styles.infoContent}>
+              <Text style={[styles.infoItemTitle, FONTS.subheading]}>Contact</Text>
+              <Text style={[styles.infoItemContent]}>
+                For privacy-related questions, please contact our support team at Contact@jaigurujewellers.in
+              </Text>
+            </View>
           </View>
-        </ScrollView>
-      </LinearGradient>
+          <View style={styles.infoItem}>
+            <View style={[styles.infoIcon, {backgroundColor: COLORS.primaryLight}]}>
+              <MaterialIcons name="update" size={SIZES.font} color={COLORS.primary} />
+            </View>
+            <View style={styles.infoContent}>
+              <Text style={[styles.infoItemTitle, FONTS.subheading]}>Policy Updates</Text>
+              <Text style={[styles.infoItemContent]}>
+                We may update this policy periodically. Please check back for changes.
+              </Text>
+            </View>
+          </View>
+        </Animated.View>
+
+        {/* Consent Footer */}
+        <View style={styles.consentFooter}>
+          <MaterialCommunityIcons name="check-decagram" size={SIZES.h4} color={COLORS.primary} />
+          <Text style={[styles.consentText, FONTS.subheading]}>
+            By using our services, you consent to our privacy policy.
+          </Text>
+        </View>
+
+        {/* Copyright */}
+        <View style={styles.copyright}>
+          <Text style={[styles.copyrightText]}>
+            © {new Date().getFullYear()} Jai Guru Jewellers. All rights reserved.
+          </Text>
+        </View>
+      </ScrollView>
     </SafeAreaView>
   );
 };
@@ -202,112 +222,107 @@ const PrivacyPolicyPage = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: bmgColors.background,
-  },
-  background: {
-    flex: 1,
+    backgroundColor: COLORS.background,
   },
   scrollContent: {
-    paddingBottom: verticalScale(40),
+    paddingBottom: verticalScale(SIZES.margin * 2),
   },
   header: {
-    padding: scale(20),
-    paddingTop: verticalScale(20),
-    paddingBottom: verticalScale(30),
-    borderBottomLeftRadius: scale(30),
-    borderBottomRightRadius: scale(30),
+    padding: scale(SIZES.padding),
+    paddingTop: verticalScale(SIZES.padding * 1.5),
+    flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: verticalScale(20),
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 6,
-    elevation: 8,
+    backgroundColor: COLORS.white,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.borderColor,
   },
-  logoContainer: {
+  backButton: {
+    padding: scale(SIZES.padding / 2),
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderRadius: scale(SIZES.radius),
+    borderColor: COLORS.borderColor,
+    backgroundColor: COLORS.title,
+  },
+  headerContent: {
+    flex: 1,
     alignItems: 'center',
-    marginBottom: verticalScale(15),
+    marginRight: scale(SIZES.h4), // To balance the back button space
   },
-
-  
   title: {
-    fontSize: scale(28),
-    fontWeight: 'bold',
-    color: bmgColors.textLight,
+    fontSize: scale(SIZES.h3),
+    color: COLORS.primary,
     marginBottom: verticalScale(5),
-    textShadowColor: 'rgba(0, 0, 0, 0.3)',
-    textShadowOffset: { width: 1, height: 1 },
-    textShadowRadius: 2,
+    // fontWeight: 'bold',
   },
   subtitle: {
-    fontSize: scale(14),
-    color: bmgColors.textLight,
-    opacity: 0.9,
+    fontSize: scale(SIZES.fontSm),
+    color: COLORS.textLight,
   },
   introCard: {
-    backgroundColor: bmgColors.card,
-    borderRadius: scale(15),
-    padding: scale(20),
-    marginHorizontal: scale(15),
-    marginBottom: verticalScale(20),
-    shadowColor: '#000',
+    backgroundColor: COLORS.outline,
+    borderRadius: scale(SIZES.radius_lg),
+    padding: scale(SIZES.padding),
+    margin: scale(SIZES.margin),
+    marginTop: verticalScale(SIZES.margin * 1.5),
+    shadowColor: COLORS.shadow,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
-    elevation: 4,
-    borderLeftWidth: 4,
-    borderLeftColor: bmgColors.primary,
+    elevation: 3,
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+  },
+  introIcon: {
+    marginRight: scale(SIZES.margin / 1.5),
+    paddingTop: verticalScale(2),
   },
   introText: {
-    fontSize: scale(16),
-    color: bmgColors.textPrimary,
-    lineHeight: verticalScale(24),
-    textAlign: 'center',
-    fontWeight: '500',
+    color: COLORS.text,
+    lineHeight: verticalScale(20),
+    flex: 1,
+   fontSize: verticalScale(SIZES.h6-4),
   },
   sectionCard: {
-    backgroundColor: bmgColors.card,
-    borderRadius: scale(15),
-    padding: scale(20),
-    marginHorizontal: scale(15),
-    marginBottom: verticalScale(15),
-    shadowColor: '#000',
+    backgroundColor: COLORS.outline,
+    borderRadius: scale(SIZES.radius_lg),
+    padding: scale(SIZES.padding),
+    marginHorizontal: scale(SIZES.margin),
+    marginBottom: verticalScale(SIZES.margin),
+    shadowColor: COLORS.shadow,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
-    elevation: 4,
+    elevation: 3,
   },
   sectionHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: verticalScale(15),
-    borderBottomWidth: 1,
-    borderBottomColor: bmgColors.border,
-    paddingBottom: verticalScale(10),
+    marginBottom: verticalScale(SIZES.margin / 1.5),
   },
   iconContainer: {
-    width: scale(40),
-    height: scale(40),
-    borderRadius: scale(20),
-    backgroundColor: 'rgba(212, 175, 55, 0.1)',
+    width: scale(SIZES.h3),
+    height: scale(SIZES.h3),
+    borderRadius: scale(SIZES.radius),
+    backgroundColor: COLORS.primaryLight,
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: scale(10),
+    marginRight: scale(SIZES.margin / 1.5),
   },
   sectionTitle: {
-    fontSize: scale(18),
-    fontWeight: 'bold',
-    color: bmgColors.primary,
+    color: COLORS.primary,
     flex: 1,
+    fontWeight: '600',
+    ...FONTS.heading,
   },
   sectionContent: {
-    fontSize: scale(16),
-    color: bmgColors.textPrimary,
-    lineHeight: verticalScale(24),
-    marginBottom: verticalScale(10),
+    color: COLORS.text,
+    lineHeight: verticalScale(20),
+    ...FONTS.subheading,
+    fontSize: verticalScale(SIZES.h6-4),
   },
   subsection: {
-    marginTop: verticalScale(10),
+    marginTop: verticalScale(SIZES.margin / 1.5),
   },
   subsectionHeader: {
     flexDirection: 'row',
@@ -318,118 +333,110 @@ const styles = StyleSheet.create({
     width: scale(6),
     height: scale(6),
     borderRadius: scale(3),
-    backgroundColor: bmgColors.primary,
-    marginRight: scale(10),
+    marginRight: scale(SIZES.margin / 1.5),
   },
   subsectionTitle: {
-    fontSize: scale(16),
-    fontWeight: '600',
-    color: bmgColors.primary,
+    color: COLORS.secondary,
+    fontWeight: '500',
   },
   subsectionContent: {
-    fontSize: scale(16),
-    color: bmgColors.textPrimary,
-    lineHeight: verticalScale(24),
-    paddingLeft: scale(16),
+    color: COLORS.text,
+    lineHeight: verticalScale(20),
+    paddingLeft: scale(SIZES.margin),
+    ...FONTS.subheading,
+    fontSize: verticalScale(SIZES.h6-4),
   },
   securityBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(212, 175, 55, 0.1)',
-    borderRadius: scale(15),
-    padding: scale(15),
-    marginHorizontal: scale(15),
-    marginBottom: verticalScale(20),
-    borderWidth: 1,
-    borderColor: bmgColors.primaryLight,
+    backgroundColor: COLORS.primaryLight,
+    borderRadius: scale(SIZES.radius_lg),
+    padding: scale(SIZES.padding),
+    marginHorizontal: scale(SIZES.margin),
+    marginBottom: verticalScale(SIZES.margin),
   },
   securityText: {
-    fontSize: scale(16),
-    color: bmgColors.primaryDark,
-    fontWeight: '600',
-    marginLeft: scale(10),
+    color: COLORS.primary,
+    marginLeft: scale(SIZES.margin / 1.5),
     flex: 1,
+    fontWeight: '500',
   },
   additionalInfo: {
-    backgroundColor: bmgColors.card,
-    borderRadius: scale(15),
-    padding: scale(20),
-    marginHorizontal: scale(15),
-    marginBottom: verticalScale(15),
-    shadowColor: '#000',
+    backgroundColor: COLORS.outline,
+    borderRadius: scale(SIZES.radius_lg),
+    padding: scale(SIZES.padding),
+    marginHorizontal: scale(SIZES.margin),
+    marginBottom: verticalScale(SIZES.margin),
+    shadowColor: COLORS.shadow,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
-    elevation: 4,
+    elevation: 3,
   },
   infoTitle: {
-    fontSize: scale(18),
-    fontWeight: 'bold',
-    color: bmgColors.primary,
-    marginBottom: verticalScale(15),
-    borderBottomWidth: 1,
-    borderBottomColor: bmgColors.border,
-    paddingBottom: verticalScale(10),
+    color: COLORS.primary,
+    marginBottom: verticalScale(SIZES.margin),
+    fontWeight: '600',
   },
   infoItem: {
     flexDirection: 'row',
-    marginBottom: verticalScale(15),
+    marginBottom: verticalScale(SIZES.margin),
   },
   infoIcon: {
-    width: scale(30),
+    width: scale(SIZES.h4),
+    height: scale(SIZES.h4),
+    borderRadius: scale(SIZES.radius_sm),
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: scale(10),
+    marginRight: scale(SIZES.margin / 1.5),
   },
   infoContent: {
     flex: 1,
   },
   infoItemTitle: {
-    fontSize: scale(16),
-    fontWeight: '600',
-    color: bmgColors.primary,
+    color: COLORS.primary,
     marginBottom: verticalScale(5),
+    fontWeight: '500',
+    fontSize: verticalScale(SIZES.h6-4),
   },
   infoItemContent: {
-    fontSize: scale(16),
-    color: bmgColors.textPrimary,
-    lineHeight: verticalScale(24),
+    color: COLORS.text,
+    lineHeight: verticalScale(20),
+    fontSize: verticalScale(SIZES.h6-4),
+    ...FONTS.subheading,
   },
   link: {
-    fontSize: scale(16),
-    color: bmgColors.primary,
+    color: COLORS.primary,
     textDecorationLine: 'underline',
-    fontWeight: '500',
+    fontSize: verticalScale(SIZES.h6-4),
+    ...FONTS.subheading,
   },
   consentFooter: {
-    borderRadius: scale(15),
-    padding: scale(20),
-    marginHorizontal: scale(15),
+    backgroundColor: COLORS.primaryLight,
+    borderRadius: scale(SIZES.radius_lg),
+    padding: scale(SIZES.padding),
+    marginHorizontal: scale(SIZES.margin),
     alignItems: 'center',
     flexDirection: 'row',
     justifyContent: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 5,
   },
   consentText: {
-    fontSize: scale(16),
-    color: bmgColors.textLight,
-    fontWeight: '600',
-    textAlign: 'center',
-    marginLeft: scale(10),
+    color: COLORS.primary,
+    marginLeft: scale(SIZES.margin / 1.5),
+    fontWeight: '500',
+    fontSize: verticalScale(SIZES.h6-4),
   },
   copyright: {
     alignItems: 'center',
-    marginTop: verticalScale(20),
-    paddingHorizontal: scale(15),
+    marginTop: verticalScale(SIZES.margin),
+    paddingHorizontal: scale(SIZES.margin),
+    marginBottom: verticalScale(SIZES.margin * 2),
   },
   copyrightText: {
-    fontSize: scale(12),
-    color: bmgColors.textSecondary,
+    color: COLORS.textLight,
     textAlign: 'center',
+    fontSize: verticalScale(SIZES.h6-4),
+    ...FONTS.body,
   },
 });
 

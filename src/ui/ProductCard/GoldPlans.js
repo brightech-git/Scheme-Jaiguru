@@ -19,7 +19,7 @@ function GoldPlan(props) {
     >
       {/* 🔥 Gradient Background */}
       <LinearGradient
-        colors={COLORS.gradientPrimary}
+        colors={COLORS.gradientPrimary2}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={styles.gradientBackground}
@@ -94,7 +94,7 @@ const styles = StyleSheet.create({
     marginTop: SIZES.margin,
   },
   knowMoreButton: {
-    backgroundColor: COLORS.primaryLight,
+    backgroundColor: COLORS.background,
     paddingVertical: SIZES.padding / 2,
     paddingHorizontal: SIZES.padding,
     borderRadius: SIZES.radius_sm,
@@ -122,14 +122,14 @@ const styles = StyleSheet.create({
     textAlign: 'right',
   },
   descriptionText: {
-    ...FONTS.font,
-    color: COLORS.text,
+    ...FONTS.h5,
+    color: COLORS.outline,
     textAlign: 'center',
     marginBottom: SIZES.margin,
   },
   knowMoreButtonText: {
     ...FONTS.h5,
-    color: COLORS.notification,
+    color: COLORS.title,
     fontWeight: '600',
     textAlign: 'center',
   },

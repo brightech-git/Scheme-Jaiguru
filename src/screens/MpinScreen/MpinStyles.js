@@ -7,12 +7,12 @@ export default StyleSheet.create({
   // ==== ROOT CONTAINERS ====
   backgroundImage: {
     flex: 1,
-    resizeMode: "cover",
-    backgroundColor: COLORS.base, // Black base
+    resizeMode: "contain",
+    // backgroundColor: COLORS.base, // Black base
   },
   keyboardContainer: {
     flex: 1,
-    backgroundColor: COLORS.base, // Always fallback black
+    // backgroundColor: COLORS.base, // Always fallback black
   },
   container: {
     flex: 1,
@@ -25,20 +25,22 @@ export default StyleSheet.create({
     alignItems: "center",
     paddingTop: Platform.OS === "ios" ? SIZES.padding * 2.5 : SIZES.padding,
     paddingBottom: SIZES.padding,
+    marginTop: -SIZES.margin * 2,
   },
   logoCard: {
-    // backgroundColor: COLORS.card, // Dark card
+    backgroundColor: COLORS.card, // Dark card
     paddingHorizontal: SIZES.padding,
-    paddingVertical: SIZES.padding * 0.75,
-    // borderRadius: SIZES.radius_lg,
+    paddingVertical: SIZES.padding,
+    borderRadius: SIZES.radius_lg,
     alignItems: "center",
     shadowColor: COLORS.shadow,
     shadowOffset: { width: 0, height: SIZES.padding / 2 },
     shadowOpacity: 0.25,
     shadowRadius: SIZES.radius_sm,
     elevation: 5,
-    // borderWidth: 1,
+    borderWidth: 1,
     borderColor: COLORS.borderColor,
+    marginBottom: -SIZES.margin ,
   },
   logoRow: {
     flexDirection: "row",
