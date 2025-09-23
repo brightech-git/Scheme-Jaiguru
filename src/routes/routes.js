@@ -29,6 +29,7 @@ function Drawer() {
       <NavigationStack.Screen name='MainPageWithYouTube' component={Screen.MainPageWithYouTube}/>
       <NavigationStack.Screen name='ProfileSidebar' component={Screen.ProfileSidebar}/>
       <NavigationStack.Screen name='AboutPage' component={Screen.AboutPage}/>
+      <NavigationStack.Screen name='Support' component={Screen.Support}/>
 
     </NavigationStack.Navigator>
   );
