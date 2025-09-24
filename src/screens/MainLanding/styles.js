@@ -94,8 +94,8 @@ export default StyleSheet.create({
   },
   companyName: {
     fontSize: SIZES.h5,
-    fontFamily: 'Poppins-Bold',
-    fontWeight: '700',
+    fontFamily: 'TrajanProBold',
+    // fontWeight: '700',
     color: COLORS.background,
     letterSpacing: 1,
   },

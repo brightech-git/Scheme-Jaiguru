@@ -30,6 +30,8 @@ function Drawer() {
       <NavigationStack.Screen name='ProfileSidebar' component={Screen.ProfileSidebar}/>
       <NavigationStack.Screen name='AboutPage' component={Screen.AboutPage}/>
       <NavigationStack.Screen name='Support' component={Screen.Support}/>
+      <NavigationStack.Screen name='EmailSupport' component={Screen.EmailSupport}/>
+      <NavigationStack.Screen name='WhatsAppSupport' component={Screen.WhatsAppSupport}/>
 
     </NavigationStack.Navigator>
   );

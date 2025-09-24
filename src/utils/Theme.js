@@ -4,7 +4,7 @@ const { width, height } = Dimensions.get("screen");
 export const COLORS = {
   // Base
   background: "#FFFFFF",   // main app background (white)
-  card: "#F9F9F9",         // card containers
+  card: "#f5f0f0ff",         // card containers
   surface: "#F5F5F5",      // elevated surfaces
   surfaceVariant: "#EEEEEE",
 

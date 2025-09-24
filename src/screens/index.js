@@ -21,6 +21,8 @@ import MainPageWithYouTube from './Youtube/Youtube'
 import ProfileSidebar from './ProfileDashboard/ProfileContainer/ProfileSidebar'
 import AboutPage from './About/About'
 import Support from "./Support/Support"
+import EmailSupport from './Support/EmailSupport'
+import WhatsAppSupport from './Support/WhatsappSupport'
 
 export {
   MainLanding,
@@ -44,5 +46,7 @@ export {
   MainPageWithYouTube,
   ProfileSidebar,
   AboutPage,
-  Support
+  Support,
+  EmailSupport,
+  WhatsAppSupport
 }

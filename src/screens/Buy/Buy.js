@@ -100,7 +100,8 @@ function Buy() {
       try {
         const [storedPhoneNumber, storedUserName] = await Promise.all([
           AsyncStorage.getItem('userPhoneNumber'),
-          AsyncStorage.getItem('userName')
+          AsyncStorage.getItem('username'),
+          // console.log('User details fetched', { storedPhoneNumber, storedUserName })
         ]);
         
         if (isMountedRef.current) {
