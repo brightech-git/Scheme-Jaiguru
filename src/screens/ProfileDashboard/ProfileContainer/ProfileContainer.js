@@ -55,32 +55,27 @@ function ProfileContainer(props) {
     fetchUserDetails();
   }, []);
 
-  const handleLogout = async () => {
-    Alert.alert(
-      'Confirm Logout',
-      'Are you sure you want to logout?',
-      [
-        {
-          text: 'Cancel',
-          onPress: () => console.log('Logout canceled'),
-          style: 'cancel',
-        },
-        {
-          text: 'Logout',
-          onPress: async () => {
-            try {
-              await AsyncStorage.removeItem('mpin');
-              await AsyncStorage.removeItem('isMpinCreated');
-              await AsyncStorage.removeItem('userPhoneNumber');
-              navigation.replace('OTP');
-            } catch (error) {
-              console.error('Error during logout:', error);
-            }
-          },
-        },
-      ]
-    );
-  };
+const handleLogout = async () => {
+  Alert.alert(
+    'Confirm Logout',
+    'Are you sure you want to logout?',
+    [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Logout',
+        onPress: async () => {
+          try {
+            await AsyncStorage.clear();
+            navigation.replace('OTP'); // Redirect to login/OTP screen
+          } catch (error) {
+            console.error('Error clearing storage:', error);
+          }
+        }
+      }
+    ]
+  );
+};
+
 
   return (
     <SafeAreaView style={styles.safeArea}>

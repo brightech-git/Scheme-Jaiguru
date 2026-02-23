@@ -183,13 +183,16 @@ function UserServicePage({ navigation }) {
     }
   };
 
-  const handleLogin = async () => {
-    if (!contactOrEmailOrUsername || !password) return showToast("Please enter email/username and password");
+const handleLogin = async () => {
+  if (!contactOrEmailOrUsername || !password) {
+    return showToast("Please enter email/username and password");
+  }
 
-    setLoading(true);
+  setLoading(true);
+  try {
     const res = await userService.loginUser({ contactOrEmailOrUsername, password });
 
-    if (res.success && res.data) {
+    if (res.success && res.data?.token) {
       const data = res.data;
       await AsyncStorage.setItem("authToken", data.token);
       await AsyncStorage.setItem("userId", String(data.id));
@@ -201,10 +204,15 @@ function UserServicePage({ navigation }) {
       showToast("Login successful!");
       navigation.navigate("MpinScreen", { step: 3 });
     } else {
-      showToast(res.error || "Login failed");
+      showToast(res.error || "Invalid credentials");
     }
+  } catch (err) {
+    showToast(err.message || "Network error");
+  } finally {
     setLoading(false);
-  };
+  }
+};
+
 
   // -------------------- UI --------------------
   return (
